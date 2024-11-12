@@ -13,7 +13,14 @@ import {
 	calculateCollisionWithRightInnerClaw,
 	calculateCollisionWithRightOuterClaw,
 } from './utils/collisionChecks.ts'
-import {ISkill} from './interfaces/Skill.ts'
+import {IInitialBall} from './interfaces/InitialBall.ts'
+import {
+	getBallInitialXMomentum,
+	getBallInitialXPos,
+	getBallInitialYMomentum,
+	getBallInitialYPos,
+	getBallRadius,
+} from './utils/ballPositionUtils.ts'
 
 /**
  * Props for the ClawMachine component.
@@ -23,7 +30,7 @@ interface IClawMachineProps {
 	 * Data for each ball to be displayed in the claw machine.
 	 * Each item should represent an individual skill or ball item.
 	 */
-	readonly ballData: ISkill[]
+	readonly ballData: IInitialBall[]
 
 	/**
 	 * Width of the canvas in pixels. Defaults to `600`.
@@ -181,14 +188,17 @@ export const ClawMachine: React.FC<IClawMachineProps> = ({
 	const createBalls = () => {
 		const initialBalls: IBall[] = []
 		ballData
-			.filter((skill) => !alreadyDroppedBalls.find((alreadyDropped) => alreadyDropped.text === skill.text))
+			.filter(
+				(initialBall) =>
+					!alreadyDroppedBalls.find((alreadyDropped) => alreadyDropped.text === initialBall.text),
+			)
 			.forEach((entry) => {
 				initialBalls.push({
-					x: Math.random() * width - dividerLineWidth - 50,
-					y: height - (Math.random() * height) / 2 + 50,
-					radius: ballRadius,
-					dx: (Math.random() - 0.5) * 4,
-					dy: (Math.random() - 0.5) * 4,
+					x: getBallInitialXPos(entry.startX, width, dividerLineWidth),
+					y: getBallInitialYPos(entry.startY, height),
+					radius: getBallRadius(entry.radius, ballRadius),
+					dx: getBallInitialXMomentum(entry.startXMomentum),
+					dy: getBallInitialYMomentum(entry.startYMomentum),
 					isInDropZone: false,
 					text: entry.text,
 					color: entry.color,
