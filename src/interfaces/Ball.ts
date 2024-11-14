@@ -5,8 +5,14 @@ export interface IBall {
 	dx: number
 	dy: number
 	isInDropZone: boolean
-	color: string
 	text: string
 	paragraphs: string[]
 	iconName: string
+	imageHeight?: number
+	imageWidth?: number
+	ballColor?: string
+	ballTextFontSize?: number
+	ballTextColor?: string
+	ballTextAlign?: 'center' | 'left' | 'right'
+	ballTextBaseline?: 'middle' | 'top' | 'bottom'
 }

@@ -59,4 +59,45 @@ export interface IInitialBall {
 	 * If undefined, a random momentum will be generated.
 	 */
 	startYMomentum?: number
+
+	/**
+	 * Height of the image inside the ball.
+	 * If undefined, the image gets adjusted to the ball size
+	 */
+	imageHeight?: number
+
+	/**
+	 * Width of the image inside the ball.
+	 * If undefined, the image gets adjusted to the ball size
+	 */
+	imageWidth?: number
+
+	/**
+	 * Color of the ball.
+	 * If undefined, defaults to red
+	 */
+	ballColor?: string
+
+	/**
+	 * Font size of the text inside the ball
+	 * If undefined, it adjusts to the ball radius
+	 */
+	ballTextFontSize?: number
+
+	/**
+	 * Text Color of the text inside the ball
+	 * If undefined, defaults to white
+	 */
+	ballTextColor?: string
+	/**
+	 * Vertical alignment of the text inside the ball
+	 * If undefined, defaults to center
+	 */
+	ballTextAlign?: 'center' | 'left' | 'right'
+
+	/**
+	 * Horizontal alignment of the text inside the ball
+	 * If undefined, defaults to middle
+	 */
+	ballTextBaseline?: 'middle' | 'top' | 'bottom'
 }

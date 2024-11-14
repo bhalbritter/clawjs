@@ -201,9 +201,15 @@ export const ClawMachine: React.FC<IClawMachineProps> = ({
 					dy: getBallInitialYMomentum(entry.startYMomentum),
 					isInDropZone: false,
 					text: entry.text,
-					color: entry.color,
+					ballColor: entry.color,
 					paragraphs: entry.paragraph,
 					iconName: entry.iconPath,
+					ballTextFontSize: entry.ballTextFontSize,
+					ballTextAlign: entry.ballTextAlign,
+					ballTextBaseline: entry.ballTextBaseline,
+					ballTextColor: entry.ballTextColor,
+					imageHeight: entry.imageHeight,
+					imageWidth: entry.imageWidth,
 				})
 			})
 		balls = initialBalls

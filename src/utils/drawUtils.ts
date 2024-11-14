@@ -1,5 +1,4 @@
 import {IPosition} from '../interfaces/Position.ts'
-import {getBallBackgroundColorForSimulation} from './ballColorUtil.ts'
 import {IBall} from '../interfaces/Ball.ts'
 
 /**
@@ -178,28 +177,36 @@ export async function preloadImagesForBalls(balls: IBall[]) {
  * Draws the ball on the given canvas context.
  *
  * @param context - The canvas rendering context.
- * @param ball - the current ball to draw
+ * @param ball - The current ball to draw.
  */
 export function drawBall(context: CanvasRenderingContext2D, ball: IBall) {
+	const defaultFontSize = ball.radius / 2
+	const defaultFontColor = 'white'
+	const defaultTextAlign: CanvasTextAlign = 'center'
+	const defaultTextBaseline: CanvasTextBaseline = 'middle'
+	const defaultBallColor = 'red'
+
 	context.beginPath()
 	context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2, false)
-	context.fillStyle = getBallBackgroundColorForSimulation(ball)
+	context.fillStyle = ball.ballColor || defaultBallColor
 	context.fill()
 	context.closePath()
+
 	const img = imageCache[ball.iconName]
 	if (ball.iconName && img) {
 		context.drawImage(
 			img,
-			ball.x - (ball.radius * 1.4) / 2,
-			ball.y - (ball.radius * 1.4) / 2,
-			ball.radius * 1.4,
-			ball.radius * 1.4,
+			ball.x - (ball.imageWidth || ball.radius * 1.4) / 2,
+			ball.y - (ball.imageHeight || ball.radius * 1.4) / 2,
+			ball.imageWidth || ball.radius * 1.4,
+			ball.imageHeight || ball.radius * 1.4,
 		)
 	} else {
-		context.font = `${ball.radius / 2}px Arial`
-		context.fillStyle = 'white'
-		context.textAlign = 'center'
-		context.textBaseline = 'middle'
+		// Draw the text if no icon is available
+		context.font = `${ball.ballTextFontSize || defaultFontSize}px Arial`
+		context.fillStyle = ball.ballTextColor || defaultFontColor
+		context.textAlign = ball.ballTextAlign || defaultTextAlign
+		context.textBaseline = ball.ballTextBaseline || defaultTextBaseline
 
 		context.fillText(ball.text, ball.x, ball.y)
 	}
