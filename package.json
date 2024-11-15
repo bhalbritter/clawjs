@@ -12,8 +12,7 @@
 	"scripts": {
 		"dev": "vite",
 		"types": "tsc --project tsconfig.json",
-		"build": "vite build && npm run types",
-		"build2": "vite build --config vite.config.ts",
+		"build": "vite build --config vite.config.ts",
 		"lint": "eslint .",
 		"preview": "vite preview",
 		"prettier:write": "npx prettier . --write",

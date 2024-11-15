@@ -6,27 +6,14 @@ export interface IInitialBall {
 	/**
 	 * Text displayed inside the ball if no icon is provided.
 	 * This can be a label or short description.
-	 * TODO: Consider allowing content to be a React Node for more flexible content types.
 	 */
 	text: string
-
-	/**
-	 * Array of paragraphs or descriptions related to this ball.
-	 * Can be used to display additional information associated with this ball.
-	 */
-	paragraph: string[]
-
-	/**
-	 * The color of the ball. Should be a valid color string (e.g., "red", "#FF0000").
-	 * TODO: Change this to accept only hex color codes for consistency.
-	 */
-	color: string
 
 	/**
 	 * The file path or URL to an icon image displayed inside the ball.
 	 * If this is defined, it will override the `text` property as the visual content of the ball.
 	 */
-	iconPath: string
+	iconPath?: string
 
 	/**
 	 * Radius of the ball, in pixels.

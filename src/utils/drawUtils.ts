@@ -167,8 +167,8 @@ function preloadImage(iconPath: string) {
  */
 export async function preloadImagesForBalls(balls: IBall[]) {
 	for (const ball of balls) {
-		if (ball.iconName && !imageCache[ball.iconName]) {
-			imageCache[ball.iconName] = await preloadImage(ball.iconName)
+		if (ball.iconPath && !imageCache[ball.iconPath]) {
+			imageCache[ball.iconPath] = await preloadImage(ball.iconPath)
 		}
 	}
 }
@@ -192,15 +192,17 @@ export function drawBall(context: CanvasRenderingContext2D, ball: IBall) {
 	context.fill()
 	context.closePath()
 
-	const img = imageCache[ball.iconName]
-	if (ball.iconName && img) {
-		context.drawImage(
-			img,
-			ball.x - (ball.imageWidth || ball.radius * 1.4) / 2,
-			ball.y - (ball.imageHeight || ball.radius * 1.4) / 2,
-			ball.imageWidth || ball.radius * 1.4,
-			ball.imageHeight || ball.radius * 1.4,
-		)
+	if (ball.iconPath) {
+		const img = imageCache[ball.iconPath]
+		if (img) {
+			context.drawImage(
+				img,
+				ball.x - (ball.imageWidth || ball.radius * 1.4) / 2,
+				ball.y - (ball.imageHeight || ball.radius * 1.4) / 2,
+				ball.imageWidth || ball.radius * 1.4,
+				ball.imageHeight || ball.radius * 1.4,
+			)
+		}
 	} else {
 		// Draw the text if no icon is available
 		context.font = `${ball.ballTextFontSize || defaultFontSize}px Arial`

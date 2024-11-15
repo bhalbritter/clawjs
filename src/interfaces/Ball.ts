@@ -6,8 +6,7 @@ export interface IBall {
 	dy: number
 	isInDropZone: boolean
 	text: string
-	paragraphs: string[]
-	iconName: string
+	iconPath?: string
 	imageHeight?: number
 	imageWidth?: number
 	ballColor?: string
