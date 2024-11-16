@@ -13,7 +13,7 @@ export interface IInitialBall {
 	 * The file path or URL to an icon image displayed inside the ball.
 	 * If this is defined, it will override the `text` property as the visual content of the ball.
 	 */
-	iconPath?: string
+	icon?: string
 
 	/**
 	 * Radius of the ball, in pixels.

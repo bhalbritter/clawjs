@@ -156,7 +156,7 @@ const imageCache: ImageCache = {}
 function preloadImage(iconPath: string) {
 	return new Promise<HTMLImageElement>((resolve) => {
 		const img = new Image()
-		img.src = '../../../../../icons/' + iconPath
+		img.src = iconPath
 		img.onload = () => resolve(img)
 	})
 }
@@ -167,8 +167,8 @@ function preloadImage(iconPath: string) {
  */
 export async function preloadImagesForBalls(balls: IBall[]) {
 	for (const ball of balls) {
-		if (ball.iconPath && !imageCache[ball.iconPath]) {
-			imageCache[ball.iconPath] = await preloadImage(ball.iconPath)
+		if (ball.icon && !imageCache[ball.icon]) {
+			imageCache[ball.icon] = await preloadImage(ball.icon)
 		}
 	}
 }
@@ -192,8 +192,8 @@ export function drawBall(context: CanvasRenderingContext2D, ball: IBall) {
 	context.fill()
 	context.closePath()
 
-	if (ball.iconPath) {
-		const img = imageCache[ball.iconPath]
+	if (ball.icon) {
+		const img = imageCache[ball.icon]
 		if (img) {
 			context.drawImage(
 				img,
