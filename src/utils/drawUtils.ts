@@ -104,6 +104,8 @@ export function drawClaw(
  * @param dividerLineLeftEnd - The end position of the left line.
  * @param dividerLineRightStart - The starting position of the right line.
  * @param dividerLineRightEnd - The starting position of the right line.
+ * @param dividerLineFillColor - Fill Color of the divider
+ * @param dividerLineBorderColor - Border Color of the divider itself
  */
 export function drawDividerLine(
 	context: CanvasRenderingContext2D,
@@ -113,11 +115,13 @@ export function drawDividerLine(
 	dividerLineLeftEnd: IPosition,
 	dividerLineRightStart: IPosition,
 	dividerLineRightEnd: IPosition,
+	dividerLineFillColor: string,
+	dividerLineBorderColor: string,
 ) {
 	context.beginPath()
 	context.moveTo(dividerLineLeftStart.x, dividerLineLeftStart.y)
 	context.lineTo(dividerLineLeftEnd.x, dividerLineLeftEnd.y)
-	context.strokeStyle = 'black'
+	context.strokeStyle = dividerLineBorderColor
 	context.lineWidth = 1
 	context.stroke()
 	context.closePath()
@@ -125,7 +129,7 @@ export function drawDividerLine(
 	context.beginPath()
 	context.moveTo(dividerLineRightStart.x, dividerLineRightStart.y)
 	context.lineTo(dividerLineRightEnd.x, dividerLineRightEnd.y)
-	context.strokeStyle = 'black'
+	context.strokeStyle = dividerLineBorderColor
 	context.lineWidth = 1
 	context.stroke()
 	context.closePath()
@@ -133,12 +137,12 @@ export function drawDividerLine(
 	context.beginPath()
 	context.moveTo(dividerLineRightStart.x, dividerLineRightStart.y)
 	context.lineTo(dividerLineLeftStart.x, dividerLineLeftStart.y)
-	context.strokeStyle = 'black'
+	context.strokeStyle = dividerLineBorderColor
 	context.lineWidth = 1
 	context.stroke()
 	context.closePath()
 
-	context.fillStyle = 'gray'
+	context.fillStyle = dividerLineFillColor
 	context.fillRect(dividerLineLeftStart.x, dividerLineLeftStart.y, dividerLineWidth, dividerLineHeight)
 }
 

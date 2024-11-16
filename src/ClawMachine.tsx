@@ -85,6 +85,18 @@ interface IClawMachineProps {
 	readonly dividerLineThickness?: number
 
 	/**
+	 * Fill color of the divider line.
+	 * Defaults to `gray`.
+	 */
+	readonly dividerLineFillColor?: string
+
+	/**
+	 * Border color of the divider line.
+	 * Defaults to `gray`.
+	 */
+	readonly dividerLineBorderColor?: string
+
+	/**
 	 * Width of the claw arms in pixels.
 	 * Controls the visual width of each claw arm. Defaults to `10`.
 	 */
@@ -157,6 +169,8 @@ export const ClawMachine: React.FC<IClawMachineProps> = ({
 	dividerLineWidth = 70,
 	dividerLineHeight = 140,
 	dividerLineThickness = 20,
+	dividerLineFillColor = 'gray',
+	dividerLineBorderColor = 'gray',
 	clawWidth = 10,
 	clawStartPositionX = 200,
 	clawStartPositionY = 40,
@@ -418,6 +432,8 @@ export const ClawMachine: React.FC<IClawMachineProps> = ({
 				dividerLineLeftEnd,
 				dividerLineRightStart,
 				dividerLineRightEnd,
+				dividerLineFillColor,
+				dividerLineBorderColor,
 			)
 
 			balls = newBalls
