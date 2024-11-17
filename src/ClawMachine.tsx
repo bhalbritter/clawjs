@@ -583,6 +583,10 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 			moveClaw,
 		}))
 
+		const checkIfOneOrMoreBallsAreAllGrabbed = () => {
+			return balls.filter((ball) => ball.y <= dividerLineHeight).length > 0
+		}
+
 		const handleMouseDown = async () => {
 			if (!allowUserControl) {
 				return
@@ -591,9 +595,11 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 			await moveClaw(claw.x, height - 50, 30, true)
 			await moveClaw(claw.x, claw.y, 0)
 			await moveClaw(claw.x, clawStartPositionY, 0)
-			await moveClaw(width - 30, clawStartPositionY, 0)
-			await moveClaw(width - 30, clawStartPositionY, 40)
-			await moveClaw(Math.round(width / 4) * 2, clawStartPositionY, 0)
+			if (checkIfOneOrMoreBallsAreAllGrabbed()) {
+				await moveClaw(width - 30, clawStartPositionY, 0)
+				await moveClaw(width - 30, clawStartPositionY, 40)
+				await moveClaw(Math.round(width / 4) * 2, clawStartPositionY, 0)
+			}
 		}
 
 		return (
