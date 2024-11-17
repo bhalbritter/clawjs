@@ -287,9 +287,19 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 
 		function handleMoveClawX() {
 			if (claw.x > claw.targetX && claw.targetX > 0) {
-				claw.x -= claw.dx
+				// Check if the next step overshoots the target
+				if (claw.x - claw.dx < claw.targetX) {
+					claw.x = claw.targetX
+				} else {
+					claw.x -= claw.dx
+				}
 			} else if (claw.x < claw.targetX && claw.targetX < width) {
-				claw.x += claw.dx
+				// Check if the next step overshoots the target
+				if (claw.x + claw.dx > claw.targetX) {
+					claw.x = claw.targetX
+				} else {
+					claw.x += claw.dx
+				}
 			}
 		}
 
@@ -533,9 +543,8 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 				y: e.clientY - rect.top,
 			}
 
-			if (Math.abs(claw.x - mousePos.x) > 10) {
-				const nearestEvenNumber: number = Math.round(mousePos.x / 2) * 2
-				claw.targetX = nearestEvenNumber
+			if (Math.abs(claw.x - mousePos.x) > 20) {
+				claw.targetX = Math.round(mousePos.x / 2) * 2 // move to nearest even number
 			}
 		}
 
