@@ -20,6 +20,8 @@ import {IBall} from '../interfaces/Ball.ts'
  * @param leftOuterLineMiddle1 - The first middle position of the left outer line.
  * @param leftOuterLineMiddle2 - The second middle position of the left outer line.
  * @param leftOuterLineEnd - The ending position of the left outer line.
+ * @param clawColor - Color of the claw
+ * @param clawBoltColor - Color of the Bolt inside the claw
  */
 export function drawClaw(
 	clawWidth: number,
@@ -38,11 +40,13 @@ export function drawClaw(
 	leftOuterLineMiddle1: IPosition,
 	leftOuterLineMiddle2: IPosition,
 	leftOuterLineEnd: IPosition,
+	clawColor: string,
+	clawBoltColor: string
 ) {
 	context.beginPath()
 	context.moveTo(innerLineStart.x, innerLineStart.y)
 	context.lineTo(innerLineStart.x, 0)
-	context.strokeStyle = 'gray'
+	context.strokeStyle = clawColor
 	context.lineWidth = clawWidth / 2
 	context.stroke()
 	context.closePath()
@@ -52,7 +56,7 @@ export function drawClaw(
 	context.lineTo(rightInnerLineMiddle1.x, rightInnerLineMiddle1.y)
 	context.lineTo(rightInnerLineMiddle2.x, rightInnerLineMiddle2.y)
 	context.lineTo(rightInnerLineEnd.x, rightInnerLineEnd.y)
-	context.strokeStyle = 'gray'
+	context.strokeStyle = clawColor
 	context.lineWidth = clawWidth
 	context.stroke()
 	context.closePath()
@@ -62,7 +66,7 @@ export function drawClaw(
 	context.lineTo(rightOuterLineMiddle1.x, rightOuterLineMiddle1.y)
 	context.lineTo(rightOuterLineMiddle2.x, rightOuterLineMiddle2.y)
 	context.lineTo(rightOuterLineEnd.x, rightOuterLineEnd.y)
-	context.strokeStyle = 'gray'
+	context.strokeStyle = clawColor
 	context.lineWidth = clawWidth
 	context.stroke()
 	context.closePath()
@@ -72,7 +76,7 @@ export function drawClaw(
 	context.lineTo(leftInnerLineMiddle1.x, leftInnerLineMiddle1.y)
 	context.lineTo(leftInnerLineMiddle2.x, leftInnerLineMiddle2.y)
 	context.lineTo(leftInnerLineEnd.x, leftInnerLineEnd.y)
-	context.strokeStyle = 'gray'
+	context.strokeStyle = clawColor
 	context.lineWidth = clawWidth
 	context.stroke()
 	context.closePath()
@@ -82,14 +86,14 @@ export function drawClaw(
 	context.lineTo(leftOuterLineMiddle1.x, leftOuterLineMiddle1.y)
 	context.lineTo(leftOuterLineMiddle2.x, leftOuterLineMiddle2.y)
 	context.lineTo(leftOuterLineEnd.x, leftOuterLineEnd.y)
-	context.strokeStyle = 'gray'
+	context.strokeStyle = clawColor
 	context.lineWidth = clawWidth
 	context.stroke()
 	context.closePath()
 
 	context.beginPath()
 	context.arc(outerLineStart.x, outerLineStart.y + clawWidth / 1.5, clawWidth / 2, 0, Math.PI * 2, false)
-	context.fillStyle = 'black'
+	context.fillStyle = clawBoltColor
 	context.fill()
 	context.closePath()
 }

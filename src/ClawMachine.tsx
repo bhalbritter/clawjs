@@ -121,22 +121,34 @@ interface IClawMachineProps {
 	readonly clawStartOpenAngle?: number
 
 	/**
-	 * horizontal speed of the claw during movement.
+	 * Horizontal speed of the claw during movement.
 	 * Defaults to `2`.
 	 */
 	readonly clawSpeedX?: number
 
 	/**
-	 * vertical speed of the claw during movement.
+	 * Vertical speed of the claw during movement.
 	 * Defaults to `1.1`.
 	 */
 	readonly clawSpeedY?: number
 
 	/**
-	 * opening speed  of the claw.
+	 * Opening speed  of the claw.
 	 * Defaults to `1`.
 	 */
 	readonly clawOpenSpeed?: number
+
+	/**
+	 * Color of the claw
+	 * Defaults to `gray`.
+	 */
+	readonly clawColor?: string
+
+	/**
+	 * Color of the bolt holding the claw together
+	 * Defaults to `black`.
+	 */
+	readonly clawBoltColor?: string
 
 	/**
 	 * Radius of each ball in pixels. Defaults to `20`.
@@ -178,6 +190,8 @@ export const ClawMachine: React.FC<IClawMachineProps> = ({
 	clawSpeedX = 2,
 	clawSpeedY = 1.1,
 	clawOpenSpeed = 1,
+	clawColor = 'gray',
+	clawBoltColor =  'black',
 	ballRadius = 20,
 	alreadyDroppedBalls,
 	addToDroppedBalls,
@@ -467,6 +481,8 @@ export const ClawMachine: React.FC<IClawMachineProps> = ({
 				leftOuterLineMiddle1,
 				leftOuterLineMiddle2,
 				leftOuterLineEnd,
+				clawColor,
+				clawBoltColor
 			)
 		}
 
