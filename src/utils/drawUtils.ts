@@ -41,7 +41,7 @@ export function drawClaw(
 	leftOuterLineMiddle2: IPosition,
 	leftOuterLineEnd: IPosition,
 	clawColor: string,
-	clawBoltColor: string
+	clawBoltColor: string,
 ) {
 	context.beginPath()
 	context.moveTo(innerLineStart.x, innerLineStart.y)
