@@ -417,7 +417,7 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 						leftInnerLineMiddle1,
 						leftInnerLineMiddle2,
 						leftInnerLineEnd,
-						claw,
+						claw.returnOnContact,
 						handleClawTouchedBall,
 					)
 					calculateCollisionWithRightInnerClaw(
@@ -426,7 +426,7 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 						rightInnerLineMiddle1,
 						rightInnerLineMiddle2,
 						rightInnerLineEnd,
-						claw,
+						claw.returnOnContact,
 						handleClawTouchedBall,
 					)
 					calculateCollisionWithRightOuterClaw(

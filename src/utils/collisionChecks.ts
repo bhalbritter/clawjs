@@ -1,7 +1,6 @@
 import {collisionResponse, isCollidingWithLine} from './collisionUtils.ts'
 import {IBall} from '../interfaces/Ball.ts'
 import {IPosition} from '../interfaces/Position.ts'
-import {IClaw} from '../interfaces/Claw.ts'
 
 /**
  * checks weather the ball has collided with the left inner claw. And handle the collision (push it inside)
@@ -10,7 +9,7 @@ import {IClaw} from '../interfaces/Claw.ts'
  * @param leftLineMiddle1 upper mid-point of the left inner claw
  * @param leftLineMiddle2 lower mid-point of the left inner claw
  * @param leftLineEnd end point of the left inner claw
- * @param claw the claw object
+ * @param shouldReturnOnContact should the claw retract if a ball is touched
  * @param handleBallTouched function that gets called if the claw touches a ball
  */
 export function calculateCollisionWithLeftInnerClaw(
@@ -19,7 +18,7 @@ export function calculateCollisionWithLeftInnerClaw(
 	leftLineMiddle1: IPosition,
 	leftLineMiddle2: IPosition,
 	leftLineEnd: IPosition,
-	claw: IClaw,
+	shouldReturnOnContact: boolean,
 	handleBallTouched: () => void,
 ) {
 	// Check collisions with claw lines
@@ -46,7 +45,7 @@ export function calculateCollisionWithLeftInnerClaw(
 	)
 
 	if (collidingWithLeftUpperInnerLine || collidingWithLeftMiddleInnerLine || collidingWithLeftLowerInnerLine) {
-		if (claw.returnOnContact) {
+		if (shouldReturnOnContact) {
 			handleBallTouched()
 		}
 
@@ -69,7 +68,7 @@ export function calculateCollisionWithLeftInnerClaw(
  * @param rightLineMiddle1 upper mid-point of the right inner claw
  * @param rightLineMiddle2 lower mid-point of the right inner claw
  * @param rightLineEnd end point of the right inner claw
- * @param claw the claw object
+ * @param shouldReturnOnContact should the claw retract if a ball is touched
  * @param handleBallTouched function that gets called if the claw touches a ball
  */
 export function calculateCollisionWithRightInnerClaw(
@@ -78,7 +77,7 @@ export function calculateCollisionWithRightInnerClaw(
 	rightLineMiddle1: IPosition,
 	rightLineMiddle2: IPosition,
 	rightLineEnd: IPosition,
-	claw: IClaw,
+	shouldReturnOnContact: boolean,
 	handleBallTouched: () => void,
 ) {
 	const collidingWithRightUpperInnerLine: boolean = isCollidingWithLine(
@@ -104,7 +103,7 @@ export function calculateCollisionWithRightInnerClaw(
 	)
 
 	if (collidingWithRightUpperInnerLine || collidingWithRightMiddleInnerLine || collidingWithRightLowerInnerLine) {
-		if (claw.returnOnContact) {
+		if (shouldReturnOnContact) {
 			handleBallTouched()
 		}
 
