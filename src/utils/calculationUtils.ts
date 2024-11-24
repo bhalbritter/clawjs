@@ -72,6 +72,6 @@ export const distanceToLineSegment = (
  * @param clawWidth - The width of the claw.
  * @returns The diagonal width calculated using the Pythagorean theorem.
  */
-export const calculateWidth = (clawWidth: number): number => {
+export const calculateClawWidth = (clawWidth: number): number => {
 	return Math.sqrt(clawWidth ^ (2 + clawWidth) ^ 2)
 }

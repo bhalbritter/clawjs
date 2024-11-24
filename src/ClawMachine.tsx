@@ -3,7 +3,7 @@ import {IBall} from './interfaces/Ball.ts'
 import {IPosition} from './interfaces/Position.ts'
 import {IClaw} from './interfaces/Claw.ts'
 import {drawBall, drawClaw, drawDividerLine, preloadImagesForBalls} from './utils/drawUtils.ts'
-import {calculateWidth, rotatePoint} from './utils/calculationUtils.ts'
+import {calculateClawWidth, rotatePoint} from './utils/calculationUtils.ts'
 import {
 	calculateCollisionsBetweenBalls,
 	calculateCollisionWithCanvasEdges,
@@ -366,12 +366,12 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 
 				const outerLineStart: IPosition = {x: claw.x, y: claw.y - clawWidth}
 				const rightOuterLineMiddle1: IPosition = rotatePoint(
-					{x: claw.x + clawSize + clawWidth, y: claw.y + clawSize - calculateWidth(clawWidth)},
+					{x: claw.x + clawSize + clawWidth, y: claw.y + clawSize - calculateClawWidth(clawWidth)},
 					innerLineStart,
 					-claw.angle,
 				)
 				const rightOuterLineMiddle2: IPosition = rotatePoint(
-					{x: claw.x + clawSize + clawWidth, y: claw.y + clawSize + clawSize + calculateWidth(clawWidth)},
+					{x: claw.x + clawSize + clawWidth, y: claw.y + clawSize + clawSize + calculateClawWidth(clawWidth)},
 					innerLineStart,
 					-claw.angle,
 				)
@@ -381,12 +381,12 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 					-claw.angle,
 				)
 				const leftOuterLineMiddle1: IPosition = rotatePoint(
-					{x: claw.x - clawSize - clawWidth, y: claw.y + clawSize - calculateWidth(clawWidth)},
+					{x: claw.x - clawSize - clawWidth, y: claw.y + clawSize - calculateClawWidth(clawWidth)},
 					innerLineStart,
 					claw.angle,
 				)
 				const leftOuterLineMiddle2: IPosition = rotatePoint(
-					{x: claw.x - clawSize - clawWidth, y: claw.y + clawSize + clawSize + calculateWidth(clawWidth)},
+					{x: claw.x - clawSize - clawWidth, y: claw.y + clawSize + clawSize + calculateClawWidth(clawWidth)},
 					innerLineStart,
 					claw.angle,
 				)
