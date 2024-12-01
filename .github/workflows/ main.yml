@@ -1,0 +1,42 @@
+name: CI Pipeline
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+
+jobs:
+    ci:
+        name: Continuous Integration
+        runs-on: ubuntu-latest
+
+        steps:
+            # Step 1: Checkout the code
+            - name: Checkout Code
+              uses: actions/checkout@v3
+
+            # Step 2: Set up Node.js
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18
+                  cache: 'npm'
+
+            # Step 3: Install dependencies
+            - name: Install Dependencies
+              run: npm ci
+
+            # Step 4: Prettier Check
+            - name: Run Prettier Check
+              run: npm run prettier:check
+
+            # Step 5: Run Tests with Vitest
+            - name: Run Tests
+              run: npm run test
+
+            # Step 6: Build the Project
+            - name: Build Project
+              run: npm run build
