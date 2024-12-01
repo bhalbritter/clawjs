@@ -1,6 +1,28 @@
-import {expect} from 'vitest'
-import {drawBall, drawClaw, drawDividerLine} from '../drawUtils.ts'
+import {expect, vi} from 'vitest'
+import {drawBall, drawClaw, drawDividerLine, preloadImagesForBalls} from '../drawUtils.ts'
 import {IBall} from '../../interfaces/Ball.ts'
+import {ICollisionPoints} from '../../interfaces/ICollisionPoints.ts'
+
+const collisionPoints: ICollisionPoints = {
+	innerLineStart: {x: 50, y: 50},
+	rightInnerLineMiddle1: {x: 60, y: 60},
+	rightInnerLineMiddle2: {x: 70, y: 70},
+	rightInnerLineEnd: {x: 80, y: 80},
+	outerLineStart: {x: 50, y: 50},
+	rightOuterLineMiddle1: {x: 60, y: 60},
+	rightOuterLineMiddle2: {x: 70, y: 70},
+	rightOuterLineEnd: {x: 80, y: 80},
+	leftInnerLineMiddle1: {x: 40, y: 60},
+	leftInnerLineMiddle2: {x: 30, y: 70},
+	leftInnerLineEnd: {x: 20, y: 80},
+	leftOuterLineMiddle1: {x: 40, y: 60},
+	leftOuterLineMiddle2: {x: 30, y: 70},
+	leftOuterLineEnd: {x: 20, y: 80},
+	dividerLineLeftStart: {x: 50, y: 50},
+	dividerLineLeftEnd: {x: 150, y: 50},
+	dividerLineRightStart: {x: 50, y: 60},
+	dividerLineRightEnd: {x: 150, y: 60},
+}
 
 describe('test draw utils', () => {
 	it('should draw a ball with default settings if no icon is provided', () => {
@@ -47,6 +69,48 @@ describe('test draw utils', () => {
 		expect(context.fillText).toHaveBeenCalledWith('Test', 50, 50)
 	})
 
+	it('should draw a ball with default settings if icon is provided', () => {
+		// Mock CanvasRenderingContext2D
+		const context = {
+			beginPath: vi.fn(),
+			arc: vi.fn(),
+			fillStyle: '',
+			fill: vi.fn(),
+			closePath: vi.fn(),
+			font: '',
+			textAlign: '',
+			textBaseline: '',
+			fillText: vi.fn(),
+		} as unknown as CanvasRenderingContext2D
+
+		// Ball without icon
+		const ball: IBall = {
+			x: 50,
+			y: 50,
+			isInDropZone: false,
+			dy: 0,
+			dx: 0,
+			radius: 20,
+			text: 'Test',
+			icon: 'testIcon',
+			ballTextFontSize: 10,
+			ballTextColor: 'blue',
+			ballTextAlign: 'center',
+			ballTextBaseline: 'middle',
+		}
+
+		preloadImagesForBalls([ball])
+		drawBall(context, ball)
+
+		expect(context.beginPath).toHaveBeenCalled()
+		expect(context.arc).toHaveBeenCalledWith(50, 50, 20, 0, Math.PI * 2, false)
+		expect(context.fillStyle).toBe('red')
+		expect(context.fill).toHaveBeenCalled()
+		expect(context.closePath).toHaveBeenCalled()
+
+		expect(context.fillStyle).toBe('red')
+	})
+
 	it('should draw the claw with the correct settings', () => {
 		// Mock CanvasRenderingContext2D
 		const context = {
@@ -64,43 +128,7 @@ describe('test draw utils', () => {
 		const clawColor = 'blue'
 		const clawBoltColor = 'yellow'
 
-		const positions = {
-			innerLineStart: {x: 50, y: 50},
-			rightInnerLineMiddle1: {x: 60, y: 60},
-			rightInnerLineMiddle2: {x: 70, y: 70},
-			rightInnerLineEnd: {x: 80, y: 80},
-			outerLineStart: {x: 50, y: 50},
-			rightOuterLineMiddle1: {x: 60, y: 60},
-			rightOuterLineMiddle2: {x: 70, y: 70},
-			rightOuterLineEnd: {x: 80, y: 80},
-			leftInnerLineMiddle1: {x: 40, y: 60},
-			leftInnerLineMiddle2: {x: 30, y: 70},
-			leftInnerLineEnd: {x: 20, y: 80},
-			leftOuterLineMiddle1: {x: 40, y: 60},
-			leftOuterLineMiddle2: {x: 30, y: 70},
-			leftOuterLineEnd: {x: 20, y: 80},
-		}
-
-		drawClaw(
-			clawWidth,
-			context,
-			positions.innerLineStart,
-			positions.rightInnerLineMiddle1,
-			positions.rightInnerLineMiddle2,
-			positions.rightInnerLineEnd,
-			positions.outerLineStart,
-			positions.rightOuterLineMiddle1,
-			positions.rightOuterLineMiddle2,
-			positions.rightOuterLineEnd,
-			positions.leftInnerLineMiddle1,
-			positions.leftInnerLineMiddle2,
-			positions.leftInnerLineEnd,
-			positions.leftOuterLineMiddle1,
-			positions.leftOuterLineMiddle2,
-			positions.leftOuterLineEnd,
-			clawColor,
-			clawBoltColor,
-		)
+		drawClaw(clawWidth, context, collisionPoints, clawColor, clawBoltColor)
 
 		// Assertions for drawing paths
 		expect(context.beginPath).toHaveBeenCalledTimes(6) // Each section of the claw + the bolt
@@ -137,19 +165,11 @@ describe('test draw utils', () => {
 		const dividerLineFillColor = 'red'
 		const dividerLineBorderColor = 'black'
 
-		const dividerLineLeftStart = {x: 50, y: 50}
-		const dividerLineLeftEnd = {x: 150, y: 50}
-		const dividerLineRightStart = {x: 50, y: 60}
-		const dividerLineRightEnd = {x: 150, y: 60}
-
 		drawDividerLine(
 			context,
 			dividerLineWidth,
 			dividerLineHeight,
-			dividerLineLeftStart,
-			dividerLineLeftEnd,
-			dividerLineRightStart,
-			dividerLineRightEnd,
+			collisionPoints,
 			dividerLineFillColor,
 			dividerLineBorderColor,
 		)
@@ -165,5 +185,34 @@ describe('test draw utils', () => {
 		// Assertions for rectangle fill
 		expect(context.fillStyle).toBe(dividerLineFillColor)
 		expect(context.fillRect).toHaveBeenCalledWith(50, 50, dividerLineWidth, dividerLineHeight)
+	})
+
+	it('should resolve with the image element when loading is successful', async () => {
+		const mockSrc = 'path/to/image.png'
+
+		// Mock the Image class
+		const mockImageInstance = {
+			src: '',
+			onload: null as null | (() => void),
+		}
+		global.Image = vi.fn(() => mockImageInstance as unknown as HTMLImageElement)
+
+		// Call the function
+		const preloadImage = (iconPath: string): Promise<HTMLImageElement> =>
+			new Promise((resolve) => {
+				const img = new Image()
+				img.src = iconPath
+				img.onload = () => resolve(img)
+			})
+
+		const preloadPromise = preloadImage(mockSrc)
+
+		// Simulate the image loading
+		mockImageInstance.onload!()
+
+		// Verify that the promise resolves with the mock image instance
+		const result = await preloadPromise
+		expect(result).toBe(mockImageInstance)
+		expect(result.src).toBe(mockSrc)
 	})
 })

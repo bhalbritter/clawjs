@@ -3,24 +3,18 @@ import {IBall} from './interfaces/Ball.ts'
 import {IPosition} from './interfaces/Position.ts'
 import {IClaw} from './interfaces/Claw.ts'
 import {drawBall, drawClaw, drawDividerLine, preloadImagesForBalls} from './utils/drawUtils.ts'
-import {calculateClawWidth, rotatePoint} from './utils/calculationUtils.ts'
-import {
-	calculateCollisionsBetweenBalls,
-	calculateCollisionWithCanvasEdges,
-	calculateCollisionWithDividerLines,
-	calculateCollisionWithLeftInnerClaw,
-	calculateCollisionWithLeftOuterClaw,
-	calculateCollisionWithRightInnerClaw,
-	calculateCollisionWithRightOuterClaw,
-} from './utils/collisionChecks.ts'
+import {calculateCollisionsBetweenBalls} from './utils/collisionChecks.ts'
 import {IInitialBall} from './interfaces/InitialBall.ts'
 import {
-	getBallInitialXMomentum,
-	getBallInitialXPos,
-	getBallInitialYMomentum,
-	getBallInitialYPos,
-	getBallRadius,
-} from './utils/ballPositionUtils.ts'
+	calculateNewBallPositionsAfterCollision,
+	calculateNewClawAnglePosition,
+	calculateNewClawXPosition,
+	calculateNewClawYPosition,
+	checkIfOneOrMoreBallsAreAllGrabbed,
+	createInitialBalls,
+	getCollisionPoints,
+} from './utils/clawMachineUtils.ts'
+import {ICollisionPoints} from './interfaces/ICollisionPoints.ts'
 
 /**
  * Props for the ClawMachine component.
@@ -153,7 +147,7 @@ interface IClawMachineProps {
 	/**
 	 * Radius of each ball in pixels. Defaults to `20`.
 	 */
-	readonly ballRadius: number
+	readonly ballRadius?: number
 
 	/**
 	 * List of balls that have already been dropped.
@@ -238,77 +232,21 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 		}
 		let allowUserControl: boolean = true
 
-		const createBalls = () => {
-			const initialBalls: IBall[] = []
-			ballData
-				.filter(
-					(initialBall) =>
-						!alreadyDroppedBalls.find((alreadyDropped) => alreadyDropped.text === initialBall.text),
-				)
-				.forEach((entry) => {
-					initialBalls.push({
-						x: getBallInitialXPos(entry.startX, width, dividerLineWidth),
-						y: getBallInitialYPos(entry.startY, height),
-						radius: getBallRadius(entry.radius, ballRadius),
-						dx: getBallInitialXMomentum(entry.startXMomentum),
-						dy: getBallInitialYMomentum(entry.startYMomentum),
-						isInDropZone: false,
-						text: entry.text,
-						icon: entry.icon,
-						ballColor: entry.ballColor,
-						ballTextFontSize: entry.ballTextFontSize,
-						ballTextAlign: entry.ballTextAlign,
-						ballTextBaseline: entry.ballTextBaseline,
-						ballTextColor: entry.ballTextColor,
-						imageHeight: entry.imageHeight,
-						imageWidth: entry.imageWidth,
-					})
-				})
-			balls = initialBalls
-		}
-
 		if (balls.length === 0) {
-			createBalls()
+			balls = createInitialBalls(ballData, alreadyDroppedBalls, width, height, ballRadius, dividerLineWidth)
 			preloadImagesForBalls(balls) // Preload images for all balls
 		}
 
 		function handleMoveClawY() {
-			if (claw.y <= claw.targetY) {
-				claw.y += claw.dy
-			} else {
-				claw.y -= claw.dy
-				claw.targetY = clawStartPositionY
-
-				if (claw.y <= clawStartPositionY) {
-					claw.y = clawStartPositionY
-				}
-			}
+			calculateNewClawYPosition(claw, clawStartPositionY)
 		}
 
 		function handleMoveClawX() {
-			if (claw.x > claw.targetX && claw.targetX > 0) {
-				// Check if the next step overshoots the target
-				if (claw.x - claw.dx < claw.targetX) {
-					claw.x = claw.targetX
-				} else {
-					claw.x -= claw.dx
-				}
-			} else if (claw.x < claw.targetX && claw.targetX < width) {
-				// Check if the next step overshoots the target
-				if (claw.x + claw.dx > claw.targetX) {
-					claw.x = claw.targetX
-				} else {
-					claw.x += claw.dx
-				}
-			}
+			calculateNewClawXPosition(claw, width)
 		}
 
 		function handleMoveClawOpenAngle() {
-			if (claw.angle > claw.targetAngle) {
-				claw.angle -= claw.dAngle
-			} else {
-				claw.angle += claw.dAngle
-			}
+			calculateNewClawAnglePosition(claw)
 		}
 
 		useEffect(() => {
@@ -332,133 +270,28 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 			const updateBalls = () => {
 				context.clearRect(0, 0, width, height)
 
-				const innerLineStart: IPosition = {x: claw.x, y: claw.y}
-				const rightInnerLineMiddle1: IPosition = rotatePoint(
-					{x: claw.x + clawSize, y: claw.y + clawSize},
-					innerLineStart,
-					-claw.angle,
-				)
-				const rightInnerLineMiddle2: IPosition = rotatePoint(
-					{x: claw.x + clawSize, y: claw.y + clawSize + clawSize},
-					innerLineStart,
-					-claw.angle,
-				)
-				const rightInnerLineEnd: IPosition = rotatePoint(
-					{x: claw.x, y: claw.y + clawSize + clawSize + clawSize},
-					innerLineStart,
-					-claw.angle,
-				)
-				const leftInnerLineMiddle1: IPosition = rotatePoint(
-					{x: claw.x - clawSize, y: claw.y + clawSize},
-					innerLineStart,
-					claw.angle,
-				)
-				const leftInnerLineMiddle2: IPosition = rotatePoint(
-					{x: claw.x - clawSize, y: claw.y + clawSize + clawSize},
-					innerLineStart,
-					claw.angle,
-				)
-				const leftInnerLineEnd: IPosition = rotatePoint(
-					{x: claw.x, y: claw.y + clawSize + clawSize + clawSize},
-					innerLineStart,
-					claw.angle,
+				const collisionPoints: ICollisionPoints = getCollisionPoints(
+					claw,
+					clawSize,
+					clawWidth,
+					width,
+					height,
+					dividerLineWidth,
+					dividerLineThickness,
+					dividerLineHeight,
 				)
 
-				const outerLineStart: IPosition = {x: claw.x, y: claw.y - clawWidth}
-				const rightOuterLineMiddle1: IPosition = rotatePoint(
-					{x: claw.x + clawSize + clawWidth, y: claw.y + clawSize - calculateClawWidth(clawWidth)},
-					innerLineStart,
-					-claw.angle,
+				const newBallsAfterCollision: IBall[] = calculateNewBallPositionsAfterCollision(
+					balls,
+					gravity,
+					width,
+					height,
+					friction,
+					groundFriction,
+					handleClawTouchedBall,
+					claw,
+					collisionPoints,
 				)
-				const rightOuterLineMiddle2: IPosition = rotatePoint(
-					{x: claw.x + clawSize + clawWidth, y: claw.y + clawSize + clawSize + calculateClawWidth(clawWidth)},
-					innerLineStart,
-					-claw.angle,
-				)
-				const rightOuterLineEnd: IPosition = rotatePoint(
-					{x: claw.x, y: claw.y + clawSize + clawSize + clawSize + clawWidth},
-					innerLineStart,
-					-claw.angle,
-				)
-				const leftOuterLineMiddle1: IPosition = rotatePoint(
-					{x: claw.x - clawSize - clawWidth, y: claw.y + clawSize - calculateClawWidth(clawWidth)},
-					innerLineStart,
-					claw.angle,
-				)
-				const leftOuterLineMiddle2: IPosition = rotatePoint(
-					{x: claw.x - clawSize - clawWidth, y: claw.y + clawSize + clawSize + calculateClawWidth(clawWidth)},
-					innerLineStart,
-					claw.angle,
-				)
-				const leftOuterLineEnd: IPosition = rotatePoint(
-					{x: claw.x, y: claw.y + clawSize + clawSize + clawSize + clawWidth},
-					innerLineStart,
-					claw.angle,
-				)
-
-				const dividerLineLeftStart: IPosition = {
-					x: width - dividerLineWidth - dividerLineThickness,
-					y: dividerLineHeight,
-				}
-				const dividerLineLeftEnd: IPosition = {x: width - dividerLineWidth - dividerLineThickness, y: height}
-				const dividerLineRightStart: IPosition = {x: width - dividerLineWidth, y: dividerLineHeight}
-				const dividerLineRightEnd: IPosition = {x: width - dividerLineWidth, y: height}
-
-				const newBallsAfterCollision: IBall[] = balls.map((ball) => {
-					ball.dy += gravity
-
-					ball.x += ball.dx
-					ball.y += ball.dy
-
-					calculateCollisionWithCanvasEdges(ball, width, height, friction, groundFriction)
-					calculateCollisionWithLeftInnerClaw(
-						ball,
-						innerLineStart,
-						leftInnerLineMiddle1,
-						leftInnerLineMiddle2,
-						leftInnerLineEnd,
-						claw.returnOnContact,
-						handleClawTouchedBall,
-					)
-					calculateCollisionWithRightInnerClaw(
-						ball,
-						innerLineStart,
-						rightInnerLineMiddle1,
-						rightInnerLineMiddle2,
-						rightInnerLineEnd,
-						claw.returnOnContact,
-						handleClawTouchedBall,
-					)
-					calculateCollisionWithRightOuterClaw(
-						ball,
-						outerLineStart,
-						rightOuterLineMiddle1,
-						rightOuterLineMiddle2,
-						rightOuterLineEnd,
-					)
-					calculateCollisionWithLeftOuterClaw(
-						ball,
-						outerLineStart,
-						leftOuterLineMiddle1,
-						leftOuterLineMiddle2,
-						leftOuterLineEnd,
-					)
-					calculateCollisionWithDividerLines(
-						ball,
-						dividerLineLeftStart,
-						dividerLineLeftEnd,
-						dividerLineRightStart,
-						dividerLineRightEnd,
-					)
-
-					const ballIsInEndZone: boolean = ball.x >= dividerLineRightEnd.x && ball.y >= height - 50
-
-					if (ballIsInEndZone) {
-						ball.isInDropZone = true
-					}
-
-					return ball
-				})
 
 				const removedBalls = newBallsAfterCollision.filter((ball) => ball.isInDropZone)
 				const newBalls = newBallsAfterCollision.filter((ball) => !ball.isInDropZone)
@@ -477,10 +310,7 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 					context,
 					dividerLineThickness,
 					height - dividerLineHeight,
-					dividerLineLeftStart,
-					dividerLineLeftEnd,
-					dividerLineRightStart,
-					dividerLineRightEnd,
+					collisionPoints,
 					dividerLineFillColor,
 					dividerLineBorderColor,
 				)
@@ -499,26 +329,7 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 					handleMoveClawOpenAngle()
 				}
 
-				drawClaw(
-					clawWidth,
-					context,
-					innerLineStart,
-					rightInnerLineMiddle1,
-					rightInnerLineMiddle2,
-					rightInnerLineEnd,
-					outerLineStart,
-					rightOuterLineMiddle1,
-					rightOuterLineMiddle2,
-					rightOuterLineEnd,
-					leftInnerLineMiddle1,
-					leftInnerLineMiddle2,
-					leftInnerLineEnd,
-					leftOuterLineMiddle1,
-					leftOuterLineMiddle2,
-					leftOuterLineEnd,
-					clawColor,
-					clawBoltColor,
-				)
+				drawClaw(clawWidth, context, collisionPoints, clawColor, clawBoltColor)
 			}
 
 			const interval: NodeJS.Timeout = setInterval(updateBalls, 1000 / 60)
@@ -529,20 +340,15 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 			if (!allowUserControl) {
 				return
 			}
-
 			const canvas = canvasRef.current
-
 			if (!canvas) {
 				return
 			}
-
 			const rect = canvas.getBoundingClientRect()
-
 			mousePos = {
 				x: e.clientX - rect.left,
 				y: e.clientY - rect.top,
 			}
-
 			if (Math.abs(claw.x - mousePos.x) > 20) {
 				claw.targetX = Math.round(mousePos.x / 2) * 2 // move to nearest even number
 			}
@@ -583,10 +389,6 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 			moveClaw,
 		}))
 
-		const checkIfOneOrMoreBallsAreAllGrabbed = () => {
-			return balls.filter((ball) => ball.y <= dividerLineHeight).length > 0
-		}
-
 		const handleMouseDown = async () => {
 			if (!allowUserControl) {
 				return
@@ -595,7 +397,7 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 			await moveClaw(claw.x, height - 50, 30, true)
 			await moveClaw(claw.x, claw.y, 0)
 			await moveClaw(claw.x, clawStartPositionY, 0)
-			if (checkIfOneOrMoreBallsAreAllGrabbed()) {
+			if (checkIfOneOrMoreBallsAreAllGrabbed(balls, dividerLineHeight)) {
 				await moveClaw(width - 30, clawStartPositionY, 0)
 				await moveClaw(width - 30, clawStartPositionY, 40)
 				await moveClaw(Math.round(width / 4) * 2, clawStartPositionY, 0)

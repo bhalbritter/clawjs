@@ -1,98 +1,79 @@
-import {IPosition} from '../interfaces/Position.ts'
 import {IBall} from '../interfaces/Ball.ts'
+import {ICollisionPoints} from '../interfaces/ICollisionPoints.ts'
 
 /**
  * Draws the claw on the given canvas context.
  *
  * @param clawWidth - size of the claw
  * @param context - The canvas rendering context.
- * @param innerLineStart - The starting position of the inner line.
- * @param rightInnerLineMiddle1 - The first middle position of the right inner line.
- * @param rightInnerLineMiddle2 - The second middle position of the right inner line.
- * @param rightInnerLineEnd - The ending position of the right inner line.
- * @param outerLineStart - The starting position of the outer line.
- * @param rightOuterLineMiddle1 - The first middle position of the right outer line.
- * @param rightOuterLineMiddle2 - The second middle position of the right outer line.
- * @param rightOuterLineEnd - The ending position of the right outer line.
- * @param leftInnerLineMiddle1 - The first middle position of the left inner line.
- * @param leftInnerLineMiddle2 - The second middle position of the left inner line.
- * @param leftInnerLineEnd - The ending position of the left inner line.
- * @param leftOuterLineMiddle1 - The first middle position of the left outer line.
- * @param leftOuterLineMiddle2 - The second middle position of the left outer line.
- * @param leftOuterLineEnd - The ending position of the left outer line.
+ * @param collisionPoints - Objects, that hold all points to draw the Claw
  * @param clawColor - Color of the claw
  * @param clawBoltColor - Color of the Bolt inside the claw
  */
 export function drawClaw(
 	clawWidth: number,
 	context: CanvasRenderingContext2D,
-	innerLineStart: IPosition,
-	rightInnerLineMiddle1: IPosition,
-	rightInnerLineMiddle2: IPosition,
-	rightInnerLineEnd: IPosition,
-	outerLineStart: IPosition,
-	rightOuterLineMiddle1: IPosition,
-	rightOuterLineMiddle2: IPosition,
-	rightOuterLineEnd: IPosition,
-	leftInnerLineMiddle1: IPosition,
-	leftInnerLineMiddle2: IPosition,
-	leftInnerLineEnd: IPosition,
-	leftOuterLineMiddle1: IPosition,
-	leftOuterLineMiddle2: IPosition,
-	leftOuterLineEnd: IPosition,
+	collisionPoints: ICollisionPoints,
 	clawColor: string,
 	clawBoltColor: string,
 ) {
 	context.beginPath()
-	context.moveTo(innerLineStart.x, innerLineStart.y)
-	context.lineTo(innerLineStart.x, 0)
+	context.moveTo(collisionPoints.innerLineStart.x, collisionPoints.innerLineStart.y)
+	context.lineTo(collisionPoints.innerLineStart.x, 0)
 	context.strokeStyle = clawColor
 	context.lineWidth = clawWidth / 2
 	context.stroke()
 	context.closePath()
 
 	context.beginPath()
-	context.moveTo(innerLineStart.x, innerLineStart.y)
-	context.lineTo(rightInnerLineMiddle1.x, rightInnerLineMiddle1.y)
-	context.lineTo(rightInnerLineMiddle2.x, rightInnerLineMiddle2.y)
-	context.lineTo(rightInnerLineEnd.x, rightInnerLineEnd.y)
+	context.moveTo(collisionPoints.innerLineStart.x, collisionPoints.innerLineStart.y)
+	context.lineTo(collisionPoints.rightInnerLineMiddle1.x, collisionPoints.rightInnerLineMiddle1.y)
+	context.lineTo(collisionPoints.rightInnerLineMiddle2.x, collisionPoints.rightInnerLineMiddle2.y)
+	context.lineTo(collisionPoints.rightInnerLineEnd.x, collisionPoints.rightInnerLineEnd.y)
 	context.strokeStyle = clawColor
 	context.lineWidth = clawWidth
 	context.stroke()
 	context.closePath()
 
 	context.beginPath()
-	context.moveTo(outerLineStart.x, outerLineStart.y)
-	context.lineTo(rightOuterLineMiddle1.x, rightOuterLineMiddle1.y)
-	context.lineTo(rightOuterLineMiddle2.x, rightOuterLineMiddle2.y)
-	context.lineTo(rightOuterLineEnd.x, rightOuterLineEnd.y)
+	context.moveTo(collisionPoints.outerLineStart.x, collisionPoints.outerLineStart.y)
+	context.lineTo(collisionPoints.rightOuterLineMiddle1.x, collisionPoints.rightOuterLineMiddle1.y)
+	context.lineTo(collisionPoints.rightOuterLineMiddle2.x, collisionPoints.rightOuterLineMiddle2.y)
+	context.lineTo(collisionPoints.rightOuterLineEnd.x, collisionPoints.rightOuterLineEnd.y)
 	context.strokeStyle = clawColor
 	context.lineWidth = clawWidth
 	context.stroke()
 	context.closePath()
 
 	context.beginPath()
-	context.moveTo(innerLineStart.x, innerLineStart.y)
-	context.lineTo(leftInnerLineMiddle1.x, leftInnerLineMiddle1.y)
-	context.lineTo(leftInnerLineMiddle2.x, leftInnerLineMiddle2.y)
-	context.lineTo(leftInnerLineEnd.x, leftInnerLineEnd.y)
+	context.moveTo(collisionPoints.innerLineStart.x, collisionPoints.innerLineStart.y)
+	context.lineTo(collisionPoints.leftInnerLineMiddle1.x, collisionPoints.leftInnerLineMiddle1.y)
+	context.lineTo(collisionPoints.leftInnerLineMiddle2.x, collisionPoints.leftInnerLineMiddle2.y)
+	context.lineTo(collisionPoints.leftInnerLineEnd.x, collisionPoints.leftInnerLineEnd.y)
 	context.strokeStyle = clawColor
 	context.lineWidth = clawWidth
 	context.stroke()
 	context.closePath()
 
 	context.beginPath()
-	context.moveTo(outerLineStart.x, outerLineStart.y)
-	context.lineTo(leftOuterLineMiddle1.x, leftOuterLineMiddle1.y)
-	context.lineTo(leftOuterLineMiddle2.x, leftOuterLineMiddle2.y)
-	context.lineTo(leftOuterLineEnd.x, leftOuterLineEnd.y)
+	context.moveTo(collisionPoints.outerLineStart.x, collisionPoints.outerLineStart.y)
+	context.lineTo(collisionPoints.leftOuterLineMiddle1.x, collisionPoints.leftOuterLineMiddle1.y)
+	context.lineTo(collisionPoints.leftOuterLineMiddle2.x, collisionPoints.leftOuterLineMiddle2.y)
+	context.lineTo(collisionPoints.leftOuterLineEnd.x, collisionPoints.leftOuterLineEnd.y)
 	context.strokeStyle = clawColor
 	context.lineWidth = clawWidth
 	context.stroke()
 	context.closePath()
 
 	context.beginPath()
-	context.arc(outerLineStart.x, outerLineStart.y + clawWidth / 1.5, clawWidth / 2, 0, Math.PI * 2, false)
+	context.arc(
+		collisionPoints.outerLineStart.x,
+		collisionPoints.outerLineStart.y + clawWidth / 1.5,
+		clawWidth / 2,
+		0,
+		Math.PI * 2,
+		false,
+	)
 	context.fillStyle = clawBoltColor
 	context.fill()
 	context.closePath()
@@ -104,10 +85,7 @@ export function drawClaw(
  * @param context - The canvas rendering context.
  * @param dividerLineWidth - Width of the divider Line.
  * @param dividerLineHeight - Height of the divider Line.
- * @param dividerLineLeftStart - The starting position of the left line.
- * @param dividerLineLeftEnd - The end position of the left line.
- * @param dividerLineRightStart - The starting position of the right line.
- * @param dividerLineRightEnd - The starting position of the right line.
+ * @param collisionPoints - Objects, that hold all points to draw the dividerLine
  * @param dividerLineFillColor - Fill Color of the divider
  * @param dividerLineBorderColor - Border Color of the divider itself
  */
@@ -115,39 +93,41 @@ export function drawDividerLine(
 	context: CanvasRenderingContext2D,
 	dividerLineWidth: number,
 	dividerLineHeight: number,
-	dividerLineLeftStart: IPosition,
-	dividerLineLeftEnd: IPosition,
-	dividerLineRightStart: IPosition,
-	dividerLineRightEnd: IPosition,
+	collisionPoints: ICollisionPoints,
 	dividerLineFillColor: string,
 	dividerLineBorderColor: string,
 ) {
 	context.beginPath()
-	context.moveTo(dividerLineLeftStart.x, dividerLineLeftStart.y)
-	context.lineTo(dividerLineLeftEnd.x, dividerLineLeftEnd.y)
+	context.moveTo(collisionPoints.dividerLineLeftStart.x, collisionPoints.dividerLineLeftStart.y)
+	context.lineTo(collisionPoints.dividerLineLeftEnd.x, collisionPoints.dividerLineLeftEnd.y)
 	context.strokeStyle = dividerLineBorderColor
 	context.lineWidth = 1
 	context.stroke()
 	context.closePath()
 
 	context.beginPath()
-	context.moveTo(dividerLineRightStart.x, dividerLineRightStart.y)
-	context.lineTo(dividerLineRightEnd.x, dividerLineRightEnd.y)
+	context.moveTo(collisionPoints.dividerLineRightStart.x, collisionPoints.dividerLineRightStart.y)
+	context.lineTo(collisionPoints.dividerLineRightEnd.x, collisionPoints.dividerLineRightEnd.y)
 	context.strokeStyle = dividerLineBorderColor
 	context.lineWidth = 1
 	context.stroke()
 	context.closePath()
 
 	context.beginPath()
-	context.moveTo(dividerLineRightStart.x, dividerLineRightStart.y)
-	context.lineTo(dividerLineLeftStart.x, dividerLineLeftStart.y)
+	context.moveTo(collisionPoints.dividerLineRightStart.x, collisionPoints.dividerLineRightStart.y)
+	context.lineTo(collisionPoints.dividerLineLeftStart.x, collisionPoints.dividerLineLeftStart.y)
 	context.strokeStyle = dividerLineBorderColor
 	context.lineWidth = 1
 	context.stroke()
 	context.closePath()
 
 	context.fillStyle = dividerLineFillColor
-	context.fillRect(dividerLineLeftStart.x, dividerLineLeftStart.y, dividerLineWidth, dividerLineHeight)
+	context.fillRect(
+		collisionPoints.dividerLineLeftStart.x,
+		collisionPoints.dividerLineLeftStart.y,
+		dividerLineWidth,
+		dividerLineHeight,
+	)
 }
 
 //cache for the different icons to prevent flickering
