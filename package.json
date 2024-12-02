@@ -1,11 +1,19 @@
 {
 	"name": "clawjs",
+	"version": "1.0.0",
+	"description": "A physics based claw-machine simulation",
 	"private": false,
 	"type": "module",
-	"version": "1.0.0",
 	"main": "dist/clawjs.umd.js",
 	"module": "dist/clawjs.es.js",
 	"types": "dist/index.d.ts",
+	"license": "MIT",
+	"keywords": ["claw-machine", "physics-based", "grabber", "claw-game", "arcade-game", "toy-claw"],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/bhalbritter/clawjs.git"
+	},
+	"author": "Benedikt Halbritter <benedikt.halbritter@icloud.com>",
 	"files": [
 		"dist"
 	],
