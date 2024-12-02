@@ -8,7 +8,14 @@
 	"module": "dist/clawjs.es.js",
 	"types": "dist/index.d.ts",
 	"license": "MIT",
-	"keywords": ["claw-machine", "physics-based", "grabber", "claw-game", "arcade-game", "toy-claw"],
+	"keywords": [
+		"claw-machine",
+		"physics-based",
+		"grabber",
+		"claw-game",
+		"arcade-game",
+		"toy-claw"
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/bhalbritter/clawjs.git"
