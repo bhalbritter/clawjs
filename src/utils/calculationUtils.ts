@@ -75,3 +75,18 @@ export const distanceToLineSegment = (
 export const calculateClawWidth = (clawWidth: number): number => {
 	return Math.sqrt(clawWidth ^ (2 + clawWidth) ^ 2)
 }
+
+/**
+ * checks if the new value is inside the set Boundary between 0 and maxValue
+ * @param value the new value
+ * @param maxValue the maximum value
+ */
+export function calculateBoundary(value: number, maxValue: number) {
+	if (value > maxValue) {
+		return maxValue
+	} else if (value < 0) {
+		return 0
+	} else {
+		return value
+	}
+}

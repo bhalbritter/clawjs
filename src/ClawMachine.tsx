@@ -15,6 +15,7 @@ import {
 	getCollisionPoints,
 } from './utils/clawMachineUtils.ts'
 import {ICollisionPoints} from './interfaces/ICollisionPoints.ts'
+import {calculateBoundary} from './utils/calculationUtils.ts'
 
 /**
  * Props for the ClawMachine component.
@@ -184,6 +185,18 @@ export interface ClawMachineCommands {
 	 * @returns A Promise that resolves when the claw reaches the specified position.
 	 */
 	moveClaw: (x: number, y: number, angle: number, immediateReturn?: boolean) => Promise<void>
+	/**
+	 * Moves the claw to the right by the claw dx speed as long as stopMoving is not called
+	 */
+	moveClawRight: () => void
+	/**
+	 * Moves the claw to the left by the claw dx speed as long as stopMoving is not called
+	 */
+	moveClawLeft: () => void
+	/**
+	 * Stops the current claw Movement triggered by moveClawRight() or moveClawLeft()
+	 */
+	stopMoving: () => void
 }
 export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 	(
@@ -216,6 +229,7 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 		ref,
 	): React.ReactElement => {
 		const canvasRef = useRef<HTMLCanvasElement | null>(null)
+		const moveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 		let balls: IBall[] = []
 		let mousePos: IPosition = {x: 0, y: 0}
 		const claw: IClaw = {
@@ -354,6 +368,47 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 			}
 		}
 
+		const handleMoveClawWithButton = async (addValue: number) => {
+			// Replace this with your actual moveClaw function
+			await moveClaw(claw.x + addValue, claw.y, claw.angle, false)
+		}
+
+		/**
+		 * Stops the current claw Movement triggered by moveClawRight() or moveClawLeft()
+		 */
+		const stopMoving = () => {
+			if (moveIntervalRef.current !== null) {
+				clearInterval(moveIntervalRef.current!)
+				moveIntervalRef.current = null
+			}
+		}
+
+		/**
+		 * Moves the claw to the right by the claw dx speed as long as stopMoving is not called
+		 */
+		const moveClawRight = () => {
+			if (!allowUserControl) {
+				return
+			}
+
+			moveIntervalRef.current = setInterval(() => {
+				handleMoveClawWithButton(claw.dx)
+			}, 5)
+		}
+
+		/**
+		 * Moves the claw to the left by the claw dx speed as long as stopMoving is not called
+		 */
+		const moveClawLeft = () => {
+			if (!allowUserControl) {
+				return
+			}
+
+			moveIntervalRef.current = setInterval(() => {
+				handleMoveClawWithButton(-claw.dx)
+			}, 5)
+		}
+
 		/**
 		 * Moves the claw to a specific position and returns a Promise if the position is reached
 		 *
@@ -366,8 +421,8 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 			return new Promise<void>((resolve) => {
 				allowUserControl = false
 				claw.returnOnContact = immediateReturn
-				claw.targetX = x
-				claw.targetY = y
+				claw.targetX = calculateBoundary(x, width)
+				claw.targetY = calculateBoundary(y, height)
 				claw.targetAngle = angle
 				const checkPosition = () => {
 					if (
@@ -387,6 +442,9 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 
 		useImperativeHandle(ref, () => ({
 			moveClaw,
+			moveClawRight,
+			moveClawLeft,
+			stopMoving,
 		}))
 
 		const handleMouseDown = async () => {

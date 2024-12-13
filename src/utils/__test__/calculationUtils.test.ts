@@ -1,5 +1,5 @@
 import {IPosition} from '../../interfaces/Position.ts'
-import {calculateClawWidth, distanceToLineSegment, rotatePoint} from '../calculationUtils.ts'
+import {calculateBoundary, calculateClawWidth, distanceToLineSegment, rotatePoint} from '../calculationUtils.ts'
 import {expect} from 'vitest'
 
 describe('test calculation utils', () => {
@@ -118,5 +118,28 @@ describe('test calculation utils', () => {
 		const clawWidth = 10
 		const result = calculateClawWidth(clawWidth)
 		expect(result).toBe(2)
+	})
+
+	it('should return the value if it is within the boundary', () => {
+		expect(calculateBoundary(50, 100)).toBe(50)
+		expect(calculateBoundary(75, 100)).toBe(75)
+	})
+
+	it('should return maxValue if the value exceeds maxValue', () => {
+		expect(calculateBoundary(150, 100)).toBe(100)
+		expect(calculateBoundary(101, 100)).toBe(100)
+	})
+
+	it('should return 0 if the value is less than 0', () => {
+		expect(calculateBoundary(-10, 100)).toBe(0)
+		expect(calculateBoundary(-1, 100)).toBe(0)
+	})
+
+	it('should return 0 if the value is exactly 0', () => {
+		expect(calculateBoundary(0, 100)).toBe(0)
+	})
+
+	it('should return maxValue if the value is exactly maxValue', () => {
+		expect(calculateBoundary(100, 100)).toBe(100)
 	})
 })
