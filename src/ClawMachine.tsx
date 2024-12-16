@@ -197,6 +197,10 @@ export interface ClawMachineCommands {
 	 * Stops the current claw Movement triggered by moveClawRight() or moveClawLeft()
 	 */
 	stopMoving: () => void
+	/**
+	 * Moves the claw down and tries to grab a ball
+	 */
+	moveClawDown: () => Promise<void>
 }
 export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 	(
@@ -440,14 +444,7 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 			})
 		}
 
-		useImperativeHandle(ref, () => ({
-			moveClaw,
-			moveClawRight,
-			moveClawLeft,
-			stopMoving,
-		}))
-
-		const handleMouseDown = async () => {
+		const moveClawDown = async () => {
 			if (!allowUserControl) {
 				return
 			}
@@ -462,6 +459,14 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 			}
 		}
 
+		useImperativeHandle(ref, () => ({
+			moveClaw,
+			moveClawRight,
+			moveClawLeft,
+			stopMoving,
+			moveClawDown,
+		}))
+
 		return (
 			<div>
 				<canvas
@@ -470,7 +475,7 @@ export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
 					height={height}
 					style={{border: '1px solid black', width: '100%'}}
 					onMouseMove={handleMouseMove}
-					onMouseDown={handleMouseDown}
+					onMouseDown={moveClawDown}
 				/>
 			</div>
 		)
