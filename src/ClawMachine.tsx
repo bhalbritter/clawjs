@@ -1,4 +1,4 @@
-import React, {useRef, useEffect, forwardRef, useImperativeHandle} from 'react'
+import React, {useRef, useEffect, forwardRef, useImperativeHandle, memo} from 'react'
 import {IBall} from './interfaces/Ball.ts'
 import {IPosition} from './interfaces/Position.ts'
 import {IClaw} from './interfaces/Claw.ts'
@@ -202,282 +202,334 @@ export interface ClawMachineCommands {
 	 */
 	moveClawDown: () => Promise<void>
 }
-export const ClawMachine = forwardRef<ClawMachineCommands, IClawMachineProps>(
-	(
-		{
-			ballData,
-			width = 600,
-			height = 400,
-			gravity = 0.2,
-			friction = 0.99,
-			groundFriction = 0.8,
-			clawSize = 30,
-			dividerLineWidth = 70,
-			dividerLineHeight = 140,
-			dividerLineThickness = 20,
-			dividerLineFillColor = 'gray',
-			dividerLineBorderColor = 'gray',
-			clawWidth = 10,
-			clawStartPositionX = 200,
-			clawStartPositionY = 40,
-			clawStartOpenAngle = 0,
-			clawSpeedX = 2,
-			clawSpeedY = 1.1,
-			clawOpenSpeed = 1,
-			clawColor = 'gray',
-			clawBoltColor = 'black',
-			ballRadius = 20,
-			alreadyDroppedBalls,
-			addToDroppedBalls,
-		},
-		ref,
-	): React.ReactElement => {
-		const canvasRef = useRef<HTMLCanvasElement | null>(null)
-		const moveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-		let balls: IBall[] = []
-		let mousePos: IPosition = {x: 0, y: 0}
-		const claw: IClaw = {
-			x: clawStartPositionX,
-			y: clawStartPositionY,
-			angle: clawStartOpenAngle,
-			targetY: clawStartPositionY,
-			targetX: clawStartPositionX,
-			targetAngle: clawStartOpenAngle,
-			dx: clawSpeedX,
-			dy: clawSpeedY,
-			dAngle: clawOpenSpeed,
-			returnOnContact: false,
-		}
-		let allowUserControl: boolean = true
-
-		if (balls.length === 0) {
-			balls = createInitialBalls(ballData, alreadyDroppedBalls, width, height, ballRadius, dividerLineWidth)
-			preloadImagesForBalls(balls) // Preload images for all balls
-		}
-
-		function handleMoveClawY() {
-			calculateNewClawYPosition(claw, clawStartPositionY)
-		}
-
-		function handleMoveClawX() {
-			calculateNewClawXPosition(claw, width)
-		}
-
-		function handleMoveClawOpenAngle() {
-			calculateNewClawAnglePosition(claw)
-		}
-
-		useEffect(() => {
-			const canvas = canvasRef.current
-			if (!canvas) {
-				// Handle the null case, or return if canvas isn't available
-				return
-			}
-
-			const context = canvas.getContext('2d')
-			if (!context) {
-				// Handle the case where '2d' context isn't supported or return
-				return
-			}
-
-			const handleClawTouchedBall = () => {
-				claw.targetAngle = 0
-				claw.targetY = claw.y
-			}
-
-			const updateBalls = () => {
-				context.clearRect(0, 0, width, height)
-
-				const collisionPoints: ICollisionPoints = getCollisionPoints(
-					claw,
-					clawSize,
-					clawWidth,
-					width,
-					height,
-					dividerLineWidth,
-					dividerLineThickness,
-					dividerLineHeight,
-				)
-
-				const newBallsAfterCollision: IBall[] = calculateNewBallPositionsAfterCollision(
-					balls,
-					gravity,
-					width,
-					height,
-					friction,
-					groundFriction,
-					handleClawTouchedBall,
-					claw,
-					collisionPoints,
-				)
-
-				const removedBalls = newBallsAfterCollision.filter((ball) => ball.isInDropZone)
-				const newBalls = newBallsAfterCollision.filter((ball) => !ball.isInDropZone)
-
-				if (removedBalls.length > 0) {
-					addToDroppedBalls(removedBalls)
-				}
-
-				calculateCollisionsBetweenBalls(balls)
-
-				newBalls.forEach((ball) => {
-					drawBall(context, ball)
-				})
-
-				drawDividerLine(
-					context,
-					dividerLineThickness,
-					height - dividerLineHeight,
-					collisionPoints,
-					dividerLineFillColor,
-					dividerLineBorderColor,
-				)
-
-				balls = newBalls
-
-				if (claw.targetY !== claw.y) {
-					handleMoveClawY()
-				}
-
-				if (claw.targetX !== claw.x) {
-					handleMoveClawX()
-				}
-
-				if (claw.angle !== claw.targetAngle) {
-					handleMoveClawOpenAngle()
-				}
-
-				drawClaw(clawWidth, context, collisionPoints, clawColor, clawBoltColor)
-			}
-
-			const interval: NodeJS.Timeout = setInterval(updateBalls, 1000 / 60)
-			return () => clearInterval(interval)
-		}, [mousePos, claw])
-
-		const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-			if (!allowUserControl) {
-				return
-			}
-			const canvas = canvasRef.current
-			if (!canvas) {
-				return
-			}
-			const rect = canvas.getBoundingClientRect()
-			mousePos = {
-				x: e.clientX - rect.left,
-				y: e.clientY - rect.top,
-			}
-			if (Math.abs(claw.x - mousePos.x) > 20) {
-				claw.targetX = Math.round(mousePos.x / 2) * 2 // move to nearest even number
-			}
-		}
-
-		const handleMoveClawWithButton = async (addValue: number) => {
-			// Replace this with your actual moveClaw function
-			await moveClaw(claw.x + addValue, claw.y, claw.angle, false)
-		}
-
-		/**
-		 * Stops the current claw Movement triggered by moveClawRight() or moveClawLeft()
-		 */
-		const stopMoving = () => {
-			if (moveIntervalRef.current !== null) {
-				clearInterval(moveIntervalRef.current!)
-				moveIntervalRef.current = null
-			}
-		}
-
-		/**
-		 * Moves the claw to the right by the claw dx speed as long as stopMoving is not called
-		 */
-		const moveClawRight = () => {
-			if (!allowUserControl) {
-				return
-			}
-
-			moveIntervalRef.current = setInterval(() => {
-				handleMoveClawWithButton(claw.dx)
-			}, 5)
-		}
-
-		/**
-		 * Moves the claw to the left by the claw dx speed as long as stopMoving is not called
-		 */
-		const moveClawLeft = () => {
-			if (!allowUserControl) {
-				return
-			}
-
-			moveIntervalRef.current = setInterval(() => {
-				handleMoveClawWithButton(-claw.dx)
-			}, 5)
-		}
-
-		/**
-		 * Moves the claw to a specific position and returns a Promise if the position is reached
-		 *
-		 * @param x The desired x position
-		 * @param y the desired y position
-		 * @param angle the desired end angle
-		 * @param immediateReturn if this property is true, the claw closes if it touches a ball on the inside and throws it to the exit area
-		 */
-		const moveClaw = (x: number, y: number, angle: number, immediateReturn: boolean = false) => {
-			return new Promise<void>((resolve) => {
-				allowUserControl = false
-				claw.returnOnContact = immediateReturn
-				claw.targetX = calculateBoundary(x, width)
-				claw.targetY = calculateBoundary(y, height)
-				claw.targetAngle = angle
-				const checkPosition = () => {
-					if (
-						Math.abs(claw.x - claw.targetX) < claw.dx &&
-						Math.abs(claw.y - claw.targetY) < claw.dy &&
-						Math.abs(claw.angle - claw.targetAngle) < claw.dAngle
-					) {
-						allowUserControl = true
-						resolve()
-					} else {
-						requestAnimationFrame(checkPosition)
-					}
-				}
-				requestAnimationFrame(checkPosition)
+export const ClawMachine = memo(
+	forwardRef<ClawMachineCommands, IClawMachineProps>(
+		(
+			{
+				ballData,
+				width = 600,
+				height = 400,
+				gravity = 0.2,
+				friction = 0.99,
+				groundFriction = 0.8,
+				clawSize = 30,
+				dividerLineWidth = 70,
+				dividerLineHeight = 140,
+				dividerLineThickness = 20,
+				dividerLineFillColor = 'gray',
+				dividerLineBorderColor = 'gray',
+				clawWidth = 10,
+				clawStartPositionX = 200,
+				clawStartPositionY = 40,
+				clawStartOpenAngle = 0,
+				clawSpeedX = 2,
+				clawSpeedY = 1.1,
+				clawOpenSpeed = 1,
+				clawColor = 'gray',
+				clawBoltColor = 'black',
+				ballRadius = 20,
+				alreadyDroppedBalls,
+				addToDroppedBalls,
+			},
+			ref,
+		): React.ReactElement => {
+			const canvasRef = useRef<HTMLCanvasElement | null>(null)
+			const moveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+			// Use refs to persist the values across re-renders
+			const ballsRef = useRef<IBall[]>([])
+			const mousePosRef = useRef<IPosition>({x: 0, y: 0})
+			const clawRef = useRef<IClaw>({
+				x: clawStartPositionX,
+				y: clawStartPositionY,
+				angle: clawStartOpenAngle,
+				targetY: clawStartPositionY,
+				targetX: clawStartPositionX,
+				targetAngle: clawStartOpenAngle,
+				dx: clawSpeedX,
+				dy: clawSpeedY,
+				dAngle: clawOpenSpeed,
+				returnOnContact: false,
 			})
-		}
+			const allowUserControlRef = useRef<boolean>(true)
 
-		const moveClawDown = async () => {
-			if (!allowUserControl) {
-				return
+			useEffect(() => {
+				if (ballsRef.current) {
+					ballsRef.current = createInitialBalls(
+						ballData,
+						alreadyDroppedBalls,
+						width,
+						height,
+						ballRadius,
+						dividerLineWidth,
+					)
+				}
+			}, [ballData, ballRadius, width, height, dividerLineWidth])
+
+			useEffect(() => {
+				if (clawRef.current.dx) {
+					clawRef.current.dx = clawSpeedX
+				}
+			}, [clawSpeedX])
+
+			useEffect(() => {
+				if (clawRef.current.dy) {
+					clawRef.current.dy = clawSpeedY
+				}
+			}, [clawSpeedY])
+
+			useEffect(() => {
+				if (clawRef.current.dAngle) {
+					clawRef.current.dAngle = clawOpenSpeed
+				}
+			}, [clawOpenSpeed])
+
+			if (ballsRef.current.length === 0) {
+				ballsRef.current = createInitialBalls(
+					ballData,
+					alreadyDroppedBalls,
+					width,
+					height,
+					ballRadius,
+					dividerLineWidth,
+				)
+				preloadImagesForBalls(ballsRef.current) // Preload images for all balls
 			}
 
-			await moveClaw(claw.x, height - 50, 30, true)
-			await moveClaw(claw.x, claw.y, 0)
-			await moveClaw(claw.x, clawStartPositionY, 0)
-			if (checkIfOneOrMoreBallsAreAllGrabbed(balls, dividerLineHeight)) {
-				await moveClaw(width - 30, clawStartPositionY, 0)
-				await moveClaw(width - 30, clawStartPositionY, 40)
-				await moveClaw(Math.round(width / 4) * 2, clawStartPositionY, 0)
+			function handleMoveClawY() {
+				calculateNewClawYPosition(clawRef.current, clawStartPositionY)
 			}
-		}
 
-		useImperativeHandle(ref, () => ({
-			moveClaw,
-			moveClawRight,
-			moveClawLeft,
-			stopMoving,
-			moveClawDown,
-		}))
+			function handleMoveClawX() {
+				calculateNewClawXPosition(clawRef.current, width)
+			}
 
-		return (
-			<div>
-				<canvas
-					ref={canvasRef}
-					width={width}
-					height={height}
-					style={{border: '1px solid black', width: '100%'}}
-					onMouseMove={handleMouseMove}
-					onMouseDown={moveClawDown}
-				/>
-			</div>
-		)
-	},
+			function handleMoveClawOpenAngle() {
+				calculateNewClawAnglePosition(clawRef.current)
+			}
+
+			useEffect(() => {
+				const canvas = canvasRef.current
+				if (!canvas) {
+					// Handle the null case, or return if canvas isn't available
+					return
+				}
+
+				const context = canvas.getContext('2d')
+				if (!context) {
+					// Handle the case where '2d' context isn't supported or return
+					return
+				}
+
+				const handleClawTouchedBall = () => {
+					clawRef.current.targetAngle = 0
+					clawRef.current.targetY = clawRef.current.y
+				}
+
+				const updateBalls = () => {
+					context.clearRect(0, 0, width, height)
+
+					const collisionPoints: ICollisionPoints = getCollisionPoints(
+						clawRef.current,
+						clawSize,
+						clawWidth,
+						width,
+						height,
+						dividerLineWidth,
+						dividerLineThickness,
+						dividerLineHeight,
+					)
+
+					const newBallsAfterCollision: IBall[] = calculateNewBallPositionsAfterCollision(
+						ballsRef.current,
+						gravity,
+						width,
+						height,
+						friction,
+						groundFriction,
+						handleClawTouchedBall,
+						clawRef.current,
+						collisionPoints,
+					)
+
+					const removedBalls = newBallsAfterCollision.filter((ball) => ball.isInDropZone)
+					const newBalls = newBallsAfterCollision.filter((ball) => !ball.isInDropZone)
+
+					if (removedBalls.length > 0) {
+						addToDroppedBalls(removedBalls)
+					}
+
+					calculateCollisionsBetweenBalls(ballsRef.current)
+
+					newBalls.forEach((ball) => {
+						drawBall(context, ball)
+					})
+
+					drawDividerLine(
+						context,
+						dividerLineThickness,
+						height - dividerLineHeight,
+						collisionPoints,
+						dividerLineFillColor,
+						dividerLineBorderColor,
+					)
+
+					ballsRef.current = newBalls
+
+					if (clawRef.current.targetY !== clawRef.current.y) {
+						handleMoveClawY()
+					}
+
+					if (clawRef.current.targetX !== clawRef.current.x) {
+						handleMoveClawX()
+					}
+
+					if (clawRef.current.angle !== clawRef.current.targetAngle) {
+						handleMoveClawOpenAngle()
+					}
+
+					drawClaw(clawWidth, context, collisionPoints, clawColor, clawBoltColor)
+				}
+
+				const interval: NodeJS.Timeout = setInterval(updateBalls, 1000 / 60)
+				return () => clearInterval(interval)
+			}, [
+				mousePosRef.current,
+				clawRef.current,
+				ballData,
+				alreadyDroppedBalls,
+				width,
+				height,
+				dividerLineWidth,
+				dividerLineThickness,
+				clawWidth,
+				clawSize,
+			])
+
+			const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+				if (!allowUserControlRef.current) {
+					return
+				}
+				const canvas = canvasRef.current
+				if (!canvas) {
+					return
+				}
+				const rect = canvas.getBoundingClientRect()
+				mousePosRef.current = {
+					x: e.clientX - rect.left,
+					y: e.clientY - rect.top,
+				}
+				if (Math.abs(clawRef.current.x - mousePosRef.current.x) > 20) {
+					clawRef.current.targetX = Math.round(mousePosRef.current.x / 2) * 2 // move to nearest even number
+				}
+			}
+
+			const handleMoveClawWithButton = async (addValue: number) => {
+				// Replace this with your actual moveClaw function
+				await moveClaw(clawRef.current.x + addValue, clawRef.current.y, clawRef.current.angle, false)
+			}
+
+			/**
+			 * Stops the current claw Movement triggered by moveClawRight() or moveClawLeft()
+			 */
+			const stopMoving = () => {
+				if (moveIntervalRef.current !== null) {
+					clearInterval(moveIntervalRef.current!)
+					moveIntervalRef.current = null
+				}
+			}
+
+			/**
+			 * Moves the claw to the right by the claw dx speed as long as stopMoving is not called
+			 */
+			const moveClawRight = () => {
+				if (!allowUserControlRef.current) {
+					return
+				}
+
+				moveIntervalRef.current = setInterval(() => {
+					handleMoveClawWithButton(clawRef.current.dx)
+				}, 5)
+			}
+
+			/**
+			 * Moves the claw to the left by the claw dx speed as long as stopMoving is not called
+			 */
+			const moveClawLeft = () => {
+				if (!allowUserControlRef.current) {
+					return
+				}
+
+				moveIntervalRef.current = setInterval(() => {
+					handleMoveClawWithButton(-clawRef.current.dx)
+				}, 5)
+			}
+
+			/**
+			 * Moves the claw to a specific position and returns a Promise if the position is reached
+			 *
+			 * @param x The desired x position
+			 * @param y the desired y position
+			 * @param angle the desired end angle
+			 * @param immediateReturn if this property is true, the claw closes if it touches a ball on the inside and throws it to the exit area
+			 */
+			const moveClaw = (x: number, y: number, angle: number, immediateReturn: boolean = false) => {
+				return new Promise<void>((resolve) => {
+					allowUserControlRef.current = false
+					clawRef.current.returnOnContact = immediateReturn
+					clawRef.current.targetX = calculateBoundary(x, width)
+					clawRef.current.targetY = calculateBoundary(y, height)
+					clawRef.current.targetAngle = angle
+					const checkPosition = () => {
+						if (
+							Math.abs(clawRef.current.x - clawRef.current.targetX) < clawRef.current.dx &&
+							Math.abs(clawRef.current.y - clawRef.current.targetY) < clawRef.current.dy &&
+							Math.abs(clawRef.current.angle - clawRef.current.targetAngle) < clawRef.current.dAngle
+						) {
+							allowUserControlRef.current = true
+							resolve()
+						} else {
+							requestAnimationFrame(checkPosition)
+						}
+					}
+					requestAnimationFrame(checkPosition)
+				})
+			}
+
+			const moveClawDown = async () => {
+				if (!allowUserControlRef.current) {
+					return
+				}
+
+				await moveClaw(clawRef.current.x, height - 50, 30, true)
+				await moveClaw(clawRef.current.x, clawRef.current.y, 0)
+				await moveClaw(clawRef.current.x, clawStartPositionY, 0)
+				if (checkIfOneOrMoreBallsAreAllGrabbed(ballsRef.current, dividerLineHeight)) {
+					await moveClaw(width - 30, clawStartPositionY, 0)
+					await moveClaw(width - 30, clawStartPositionY, 40)
+					await moveClaw(Math.round(width / 4) * 2, clawStartPositionY, 0)
+				}
+			}
+
+			useImperativeHandle(ref, () => ({
+				moveClaw,
+				moveClawRight,
+				moveClawLeft,
+				stopMoving,
+				moveClawDown,
+			}))
+
+			return (
+				<div>
+					<canvas
+						ref={canvasRef}
+						width={width}
+						height={height}
+						style={{border: '1px solid black', width: '100%'}}
+						onMouseMove={handleMouseMove}
+						onMouseDown={moveClawDown}
+					/>
+				</div>
+			)
+		},
+	),
 )
