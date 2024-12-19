@@ -1,50 +1,88 @@
-# React + TypeScript + Vite
+# ClawJs
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ClawJs is a physic based claw machine that provides various features for customization.
 
-Currently, two official plugins are available:
+Demo
 
--   [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
--   [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Installation
 
-## Expanding the ESLint configuration
+    npm install clawJs
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Usage
 
--   Configure the top-level `parserOptions` property like this:
+    import { ClawMachineCommands } from 'clawjs/dist/ClawMachine'
+    import { IInitialBall } from 'clawjs/dist/interfaces/InitialBall'
 
-```js
-export default tseslint.config({
-	languageOptions: {
-		// other options...
-		parserOptions: {
-			project: ['./tsconfig.node.json', './tsconfig.app.json'],
-			tsconfigRootDir: import.meta.dirname,
-		},
-	},
-})
-```
+    const initialState: IInitialBall[] = [
+    	{
+    		text: 'test',
+    		ballColor: 'gray',
+    		ballTextColor: 'yellow',
+    		icon: react,
+    	},
+    ]
 
--   Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
--   Optionally add `...tseslint.configs.stylisticTypeChecked`
--   Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+    <ClawMachine alreadyDroppedBalls={[]}
+        addToDroppedBalls={(balls) => console.log(balls)}
+        ballData={initialState}
+    />
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## Claw Machine Parameter
 
-export default tseslint.config({
-	// Set the react version
-	settings: {react: {version: '18.3'}},
-	plugins: {
-		// Add the react plugin
-		react,
-	},
-	rules: {
-		// other rules...
-		// Enable its recommended rules
-		...react.configs.recommended.rules,
-		...react.configs['jsx-runtime'].rules,
-	},
-})
-```
+| **Prop Name**            | **Type**        | **Default** | **Required** | **Description**                                                                                                            |
+| ------------------------ | --------------- | ----------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `ballData`               | `Array<Object>` | -           | Yes          | An array of ball configurations. Each ball object should have `text`, `ballColor`, `ballTextColor`, and optionally `icon`. |
+| `alreadyDroppedBalls`    | `Array`         | -           | Yes          | List of balls that have already been dropped from the machine.                                                             |
+| `addToDroppedBalls`      | `Function`      | -           | Yes          | Callback function triggered when a ball is dropped.                                                                        |
+| `width`                  | `Number`        | `600`       | No           | The width of the claw machine in pixels.                                                                                   |
+| `height`                 | `Number`        | `400`       | No           | The height of the claw machine in pixels.                                                                                  |
+| `ballRadius`             | `Number`        | `20`        | Yes          | The radius of each ball in pixels.                                                                                         |
+| `gravity`                | `Number`        | `0.2`       | No           | The gravity effect on the balls. Higher values make balls fall faster.                                                     |
+| `friction`               | `Number`        | `0.99`      | No           | The air resistance that slows the balls’ movement.                                                                         |
+| `groundFriction`         | `Number`        | `0.8`       | No           | The friction between the balls and the ground surface.                                                                     |
+| `clawSize`               | `Number`        | `30`        | No           | The size of the claw's opening in pixels.                                                                                  |
+| `clawWidth`              | `Number`        | `10`        | No           | The thickness of the claw's arms.                                                                                          |
+| `dividerLineWidth`       | `Number`        | `70`        | No           | The width of the divider line in pixels.                                                                                   |
+| `dividerLineHeight`      | `Number`        | `140`       | No           | The height of the divider line in pixels.                                                                                  |
+| `dividerLineThickness`   | `Number`        | `20`        | No           | The thickness of the divider line in pixels.                                                                               |
+| `dividerLineFillColor`   | `String`        | `gray`      | No           | The color of the divider line.                                                                                             |
+| `dividerLineBorderColor` | `String`        | `gray`      | No           | The border color of the divider line.                                                                                      |
+| `clawColor`              | `String`        | `"gray"`    | No           | The color of the claw.                                                                                                     |
+| `clawBoltColor`          | `String`        | `"black"`   | No           | The color of the claw's bolts.                                                                                             |
+| `clawStartPositionX`     | `Number`        | `200`       | No           | Initial horizontal position of the claw when it is raised.                                                                 |
+| `clawStartPositionY`     | `Number`        | `40`        | No           | Initial vertical position of the claw when it is raised.                                                                   |
+| `clawStartOpenAngle`     | `Number`        | `0`         | No           | Initial open Angle of the Claw.                                                                                            |
+| `clawSpeedX`             | `Number`        | `2`         | No           | The speed of the claw moving horizontally (X-axis).                                                                        |
+| `clawSpeedY`             | `Number`        | `1.1`       | No           | The speed of the claw moving vertically (Y-axis).                                                                          |
+| `clawOpenSpeed`          | `Number`        | `1`         | No           | The speed of the claw opening.                                                                                             |
+
+## Initial Ball Parameter
+
+| **Prop Name**      | **Type**                      | **Default**        | **Required** | **Description**                                                  |
+| ------------------ | ----------------------------- | ------------------ | ------------ | ---------------------------------------------------------------- |
+| `text`             | `String`                      | -                  | Yes          | Text displayed inside the ball if no icon is provided.           |
+| `icon`             | `String`                      | ball text          | No           | The file path or URL to an icon image displayed inside the ball. |
+| `radius`           | `Number`                      | global ball radius | No           | Radius of the ball, in pixels.                                   |
+| `startX`           | `Number`                      | random             | No           | Initial X-coordinate position of the ball on the canvas.         |
+| `startY`           | `Number`                      | random             | No           | Initial Y-coordinate position of the ball on the canvas.         |
+| `startXMomentum`   | `Number`                      | random             | No           | Initial horizontal momentum (velocity) of the ball.              |
+| `startYMomentum`   | `Number`                      | random             | No           | Initial vertical momentum (velocity) of the ball.                |
+| `imageHeight`      | `Number`                      | ball size          | No           | Height of the image inside the ball.                             |
+| `imageWidth`       | `Number`                      | ball size          | No           | Width of the image inside the ball.                              |
+| `ballColor`        | `String`                      | `red`              | No           | Color of the ball.                                               |
+| `ballTextFontSize` | `Number`                      | ball size          | No           | Font size of the text inside the ball.                           |
+| `ballTextColor`    | `String`                      | `white`            | No           | Text color of the text inside the ball.                          |
+| `ballTextAlign`    | `center` or `left` or `right` | `center`           | No           | Vertical alignment of the text inside the ball.                  |
+| `ballTextBaseline` | `middle` or `top` or `bottom` | `middle`           | No           | Horizontal alignment of the text inside the ball.                |
+
+## Known problems
+
+#### Balls slip out of the claw after they are grabbed
+
+Currently sometime balls are able to leave the claw. This is especially the case if:
+
+-   The balls are very small
+-   The horizontal speed of the claw is very high
+-   Many balls are grabbed at once
+
+The easiest way is to prevent the cases described above.
