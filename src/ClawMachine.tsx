@@ -262,6 +262,7 @@ export const ClawMachine = memo(
 						ballRadius,
 						dividerLineWidth,
 					)
+					preloadImagesForBalls(ballsRef.current) // Preload images for all balls
 				}
 			}, [ballData, ballRadius, width, height, dividerLineWidth])
 
@@ -282,18 +283,6 @@ export const ClawMachine = memo(
 					clawRef.current.dAngle = clawOpenSpeed
 				}
 			}, [clawOpenSpeed])
-
-			if (ballsRef.current.length === 0) {
-				ballsRef.current = createInitialBalls(
-					ballData,
-					alreadyDroppedBalls,
-					width,
-					height,
-					ballRadius,
-					dividerLineWidth,
-				)
-				preloadImagesForBalls(ballsRef.current) // Preload images for all balls
-			}
 
 			function handleMoveClawY() {
 				calculateNewClawYPosition(clawRef.current, clawStartPositionY)
