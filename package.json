@@ -14,13 +14,15 @@
 		"grabber",
 		"claw-game",
 		"arcade-game",
-		"toy-claw"
+		"toy-claw",
+		"front-end",
+		"component"
 	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/bhalbritter/clawjs.git"
 	},
-	"author": "Benedikt Halbritter <benedikt.halbritter@icloud.com>",
+	"author": "Benedikt Halbritter <ragouts-schwaermen.0y@icloud.com>",
 	"files": [
 		"dist"
 	],
