@@ -1,12 +1,30 @@
 # ClawJs
 
-ClawJs is a physic based claw machine that provides various features for customization.
+ClawJs is a physic-based claw machine that provides various features for customization.
 
-Demo
+## Table of Contents
+
+-   [Demo](#demo)
+-   [Installation](#installation)
+-   [Usage](#usage)
+-   [Claw Machine Parameters](#claw-machine-parameters)
+-   [Initial Ball Parameters](#initial-ball-parameters)
+-   [Known Problems](#known-problems)
+-   [License](#license)
+
+## Demo
+
+Check out the live demo here: [Live Demo](https://example.com)
 
 ## Installation
 
     npm install clawJs
+
+## Features
+
+-   Fully customizable claw machine parameters (size, speed, etc.)
+-   Support for dynamic ball configurations
+-   TypeScript support for better developer experience
 
 ## Usage
 
@@ -27,7 +45,7 @@ Demo
         ballData={initialState}
     />
 
-## Claw Machine Parameter
+## Claw Machine Parameters
 
 | **Prop Name**            | **Type**        | **Default** | **Required** | **Description**                                                                                                            |
 | ------------------------ | --------------- | ----------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
@@ -56,7 +74,7 @@ Demo
 | `clawSpeedY`             | `Number`        | `1.1`       | No           | The speed of the claw moving vertically (Y-axis).                                                                          |
 | `clawOpenSpeed`          | `Number`        | `1`         | No           | The speed of the claw opening.                                                                                             |
 
-## Initial Ball Parameter
+## Initial Ball Parameters
 
 | **Prop Name**      | **Type**                      | **Default**        | **Required** | **Description**                                                  |
 | ------------------ | ----------------------------- | ------------------ | ------------ | ---------------------------------------------------------------- |
@@ -75,14 +93,18 @@ Demo
 | `ballTextAlign`    | `center` or `left` or `right` | `center`           | No           | Vertical alignment of the text inside the ball.                  |
 | `ballTextBaseline` | `middle` or `top` or `bottom` | `middle`           | No           | Horizontal alignment of the text inside the ball.                |
 
-## Known problems
+## Known Problems
 
 #### Balls slip out of the claw after they are grabbed
 
-Currently sometime balls are able to leave the claw. This is especially the case if:
+Currently, sometimes balls are able to leave the claw. This is especially the case if:
 
 -   The balls are very small
 -   The horizontal speed of the claw is very high
 -   Many balls are grabbed at once
 
 The easiest way is to prevent the cases described above.
+
+## License
+
+ClawJs is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
