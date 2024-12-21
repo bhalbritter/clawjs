@@ -1,6 +1,6 @@
 {
-	"name": "clawjs",
-	"version": "1.0.0",
+	"name": "claw-machine-js",
+	"version": "1.0.2",
 	"description": "A physics based claw-machine simulation",
 	"private": false,
 	"type": "module",

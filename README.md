@@ -1,8 +1,8 @@
-# ClawJs
+# Claw-Machine-Js
 
 ClawJs is a physic-based claw machine that provides various features for customization.
 
-## Table of Contents
+## Claw-Machine-Js
 
 -   [Demo](#demo)
 -   [Installation](#installation)
@@ -14,11 +14,11 @@ ClawJs is a physic-based claw machine that provides various features for customi
 
 ## Demo
 
-Check out the live demo here: [Live Demo](https://example.com)
+Check out the live demo here: [Live Demo](https://bhalbritter.github.io/claw-machine-js-showcase/)
 
 ## Installation
 
-    npm install clawJs
+    npm i claw-machine-js
 
 ## Features
 
@@ -48,7 +48,7 @@ Check out the live demo here: [Live Demo](https://example.com)
 ## Claw Machine Parameters
 
 | **Prop Name**            | **Type**        | **Default** | **Required** | **Description**                                                                                                            |
-| ------------------------ | --------------- | ----------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+|--------------------------|-----------------|-------------|--------------|----------------------------------------------------------------------------------------------------------------------------|
 | `ballData`               | `Array<Object>` | -           | Yes          | An array of ball configurations. Each ball object should have `text`, `ballColor`, `ballTextColor`, and optionally `icon`. |
 | `alreadyDroppedBalls`    | `Array`         | -           | Yes          | List of balls that have already been dropped from the machine.                                                             |
 | `addToDroppedBalls`      | `Function`      | -           | Yes          | Callback function triggered when a ball is dropped.                                                                        |
@@ -77,7 +77,7 @@ Check out the live demo here: [Live Demo](https://example.com)
 ## Initial Ball Parameters
 
 | **Prop Name**      | **Type**                      | **Default**        | **Required** | **Description**                                                  |
-| ------------------ | ----------------------------- | ------------------ | ------------ | ---------------------------------------------------------------- |
+|--------------------|-------------------------------|--------------------|--------------|------------------------------------------------------------------|
 | `text`             | `String`                      | -                  | Yes          | Text displayed inside the ball if no icon is provided.           |
 | `icon`             | `String`                      | ball text          | No           | The file path or URL to an icon image displayed inside the ball. |
 | `radius`           | `Number`                      | global ball radius | No           | Radius of the ball, in pixels.                                   |
