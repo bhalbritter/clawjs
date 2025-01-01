@@ -199,8 +199,9 @@ export interface ClawMachineCommands {
 	stopMoving: () => void
 	/**
 	 * Moves the claw down and tries to grab a ball
+	 * @param clawDropDelay - Delay in ms that happens between reaching the drop position and the claw reset. Defaults to 500ms
 	 */
-	moveClawDown: () => Promise<void>
+	moveClawDown: (clawDropDelay?: number) => Promise<void>
 }
 export const ClawMachine = memo(
 	forwardRef<ClawMachineCommands, IClawMachineProps>(
@@ -470,9 +471,9 @@ export const ClawMachine = memo(
 					clawRef.current.targetAngle = angle
 					const checkPosition = () => {
 						if (
-							Math.abs(clawRef.current.x - clawRef.current.targetX) < clawRef.current.dx &&
-							Math.abs(clawRef.current.y - clawRef.current.targetY) < clawRef.current.dy &&
-							Math.abs(clawRef.current.angle - clawRef.current.targetAngle) < clawRef.current.dAngle
+							Math.abs(clawRef.current.x - clawRef.current.targetX) <= clawRef.current.dx &&
+							Math.abs(clawRef.current.y - clawRef.current.targetY) <= clawRef.current.dy &&
+							Math.abs(clawRef.current.angle - clawRef.current.targetAngle) <= clawRef.current.dAngle
 						) {
 							allowUserControlRef.current = true
 							resolve()
@@ -484,18 +485,19 @@ export const ClawMachine = memo(
 				})
 			}
 
-			const moveClawDown = async () => {
+			const moveClawDown = async (clawDropDelay?: number | undefined) => {
 				if (!allowUserControlRef.current) {
 					return
 				}
 
-				await moveClaw(clawRef.current.x, height - 50, 30, true)
+				await moveClaw(clawRef.current.x, height - 50, 40, true)
 				await moveClaw(clawRef.current.x, clawRef.current.y, 0)
 				await moveClaw(clawRef.current.x, clawStartPositionY, 0)
 				if (checkIfOneOrMoreBallsAreAllGrabbed(ballsRef.current, dividerLineHeight)) {
 					await moveClaw(width - 30, clawStartPositionY, 0)
-					await moveClaw(width - 30, clawStartPositionY, 40)
-					await moveClaw(Math.round(width / 4) * 2, clawStartPositionY, 0)
+					await moveClaw(width - 30, clawStartPositionY, 40).then(() => {
+						setTimeout(() => moveClaw(Math.round(width / 4) * 2, clawStartPositionY, 0), clawDropDelay || 500)
+					})
 				}
 			}
 
@@ -515,7 +517,7 @@ export const ClawMachine = memo(
 						height={height}
 						style={{border: '1px solid black', width: '100%'}}
 						onMouseMove={handleMouseMove}
-						onMouseDown={moveClawDown}
+						onMouseDown={() => moveClawDown()}
 					/>
 				</div>
 			)
