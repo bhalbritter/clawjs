@@ -1,7 +1,7 @@
 <h2 align="center">Claw-Machine-Js</h2>
 
 <p align="center">
-  <img src="./public/clawMachineDemonstration.gif" alt="Claw Machine Demo">
+  <img src="./assets/clawMachineDemonstration.gif" alt="Claw Machine Demo">
 </p>
 
 ClawJs is a physic-based claw machine that provides various features for customization.
