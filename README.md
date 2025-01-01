@@ -1,8 +1,10 @@
-# Claw-Machine-Js
+<h2 align="center">Claw-Machine-Js</h2>
+
+<p align="center">
+  <img src="./public/clawMachineDemonstration.gif" alt="Claw Machine Demo">
+</p>
 
 ClawJs is a physic-based claw machine that provides various features for customization.
-
-## Claw-Machine-Js
 
 -   [Demo](#demo)
 -   [Installation](#installation)
@@ -92,6 +94,86 @@ Check out the live demo here: [Live Demo](https://bhalbritter.github.io/claw-mac
 | `ballTextColor`    | `String`                      | `white`            | No           | Text color of the text inside the ball.                          |
 | `ballTextAlign`    | `center` or `left` or `right` | `center`           | No           | Vertical alignment of the text inside the ball.                  |
 | `ballTextBaseline` | `middle` or `top` or `bottom` | `middle`           | No           | Horizontal alignment of the text inside the ball.                |
+
+## Claw Control Functions
+
+It is also possible to control the claw with a number of functions.
+
+    import { ClawMachineCommands } from 'clawjs/dist/ClawMachine'
+    import { IInitialBall } from 'clawjs/dist/interfaces/InitialBall'
+
+    const clawMachineRef = useRef<ClawMachineCommands>(null)
+    const initialState: IInitialBall[] = [
+    	{
+    		text: 'test',
+    		ballColor: 'gray',
+    		ballTextColor: 'yellow',
+    		icon: react,
+    	},
+    ]
+
+    const handleMoveClawRight = async () => {
+    	if (clawMachineRef.current) {
+    		clawMachineRef.current.moveClawRight()
+    	}
+    }
+
+    <ClawMachine alreadyDroppedBalls={[]}
+        ref={clawMachineRef}
+        addToDroppedBalls={(balls) => console.log(balls)}
+        ballData={initialState}
+    />
+    <button onMouseDown={() => handleMoveClawRight()}>Move Right</button>
+
+### Functions
+
+#### `moveClaw`
+
+-   **Return Type**: `Promise<void>`
+-   **Parameters**:
+    -   `x` (number): The desired x-coordinate for the claw.
+    -   `y` (number): The desired y-coordinate for the claw.
+    -   `angle` (number): The desired angle for the claw's open/closed state.
+    -   `immediateReturn` (boolean, optional): If `true`, the claw closes if it touches a ball and throws it to the exit area.
+-   **Description**:
+    Moves the claw to a specified position. Resolves the promise once the position is reached.
+
+---
+
+#### `moveClawRight`
+
+-   **Return Type**: `void`
+-   **Parameters**: None
+-   **Description**:
+    Moves the claw to the right at a set speed (`dx`) until `stopMoving()` is called.
+
+---
+
+#### `moveClawLeft`
+
+-   **Return Type**: `void`
+-   **Parameters**: None
+-   **Description**:
+    Moves the claw to the left at a set speed (`dx`) until `stopMoving()` is called.
+
+---
+
+#### `stopMoving`
+
+-   **Return Type**: `void`
+-   **Parameters**: None
+-   **Description**:
+    Stops any ongoing movement initiated by `moveClawRight()` or `moveClawLeft()`.
+
+---
+
+#### `moveClawDown`
+
+-   **Return Type**: `Promise<void>`
+-   **Parameters**:
+    -   `clawDropDelay` (number, optional): The delay in milliseconds between the claw reaching the drop position and its reset. Defaults to `500ms`.
+-   **Description**:
+    Moves the claw downward and attempts to grab a ball. Resolves the promise once the claw operation completes.
 
 ## Known Problems
 
