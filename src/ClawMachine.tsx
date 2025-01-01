@@ -496,7 +496,10 @@ export const ClawMachine = memo(
 				if (checkIfOneOrMoreBallsAreAllGrabbed(ballsRef.current, dividerLineHeight)) {
 					await moveClaw(width - 30, clawStartPositionY, 0)
 					await moveClaw(width - 30, clawStartPositionY, 40).then(() => {
-						setTimeout(() => moveClaw(Math.round(width / 4) * 2, clawStartPositionY, 0), clawDropDelay || 500)
+						setTimeout(
+							() => moveClaw(Math.round(width / 4) * 2, clawStartPositionY, 0),
+							clawDropDelay || 500,
+						)
 					})
 				}
 			}
